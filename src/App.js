@@ -10,8 +10,11 @@ import useCombinedReducer from './hooks/combineReducers.js';
 // ...
 
 
-
 const App = () => {
+
+    useEffect(() => {
+        console.log('awake');
+    }, []);
 
     return <div>hw</div>;
 }
