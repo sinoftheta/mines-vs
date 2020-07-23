@@ -1,5 +1,7 @@
 const path = require('path');
+
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     entry: {
@@ -41,7 +43,14 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({  
             template: "./src/index.html",
-            filename: "./index.html"})
+            filename: "./index.html"}),
+        new CopyWebpackPlugin({
+            patterns: [{
+                from: './src/timeline/timeline.js',
+                to: './timeline.js'
+            }]
+        })
+
     ],
     resolve: {
         extensions: ['*', '.js', '.jsx']

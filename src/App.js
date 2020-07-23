@@ -5,6 +5,8 @@ import React, {useReducer, useEffect} from 'react';
 import DispatchContext from './hooks/dispContext.js';
 import useCombinedReducer from './hooks/combineReducers.js';
 
+import Timeline from './components/Timeline.js';
+
 
 // COMPONENTS //
 // ...
@@ -16,7 +18,9 @@ const App = () => {
         console.log('awake');
     }, []);
 
-    return <div>hw</div>;
+    return <Timeline
+        options={'idk'}
+    />;
 }
 
 export default App;
