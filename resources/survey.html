@@ -10,23 +10,28 @@
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 
-<body>
+<body class='bg-secondary'>
 
-    <div class="container">
+    <div class="container mt-5">
+        <div class="alert alert-warning text-center text-dark" role="alert">
+            <div class='h5'>Instructions</div>
+            Use the form below to rate the performance of you and your team members for the assignment.
+         </div>
         <div class="card">
+            <div class='card-header'>
+                <div class='h4'>Aldebaran :  Assignment 1</div>
+            </div>
             <div class="card-body">
-                <div class="alert alert-warning text-center" role="alert">
-                   <span class="font-weight-bold">Aldebaran:</span> Rate the performance of you and your team members.
-                </div>
+                
                 <table class="table table-striped text-center">
                     <thead>
                       <tr>
-                        <th scope="col"></th>
-                        <th scope="col">1 <br> Greatly Below Expectations</th>
-                        <th scope="col">2 <br> Below Expectations</th>
-                        <th scope="col">Met Expectations</th>
-                        <th scope="col">4 <br> Exceeded Expectations</th>
-                        <th scope="col">5 <br> Greatly Exceeded Expectations</th>
+                        <th scope="col">Team Member</th>
+                        <th scope="col">1<br><small>Greatly Below Expectations</small></th>
+                        <th scope="col">2<br><small>Below Expectations</small></th>
+                        <th scope="col">3<br><small>Met Expectations</small></th>
+                        <th scope="col">4<br><small>Exceeded Expectations</small></th>
+                        <th scope="col">5<br><small>Greatly Exceeded Expectations</small></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -144,12 +149,17 @@
                       </tr>
                     </tbody>
                   </table>
-                  <p class="text-right">
-                    <button type="button" class="btn btn-primary text-right">Submit</button>
-                  </p>
+            </div>
+            <div class="card-footer text-right">
+                <button type="button" class="btn btn-lg btn-primary text-right">Submit</button>
             </div>
         </div>
     </div>
 </body>
-
+<style>
+    .form-check-input {
+        transform: scale(2);
+    }
+</style>
 </html>
+
