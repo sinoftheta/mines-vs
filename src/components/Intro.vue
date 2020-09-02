@@ -8,7 +8,7 @@
                     </div>
                     <div class='card-body text-center p-3'>
                         <div class='font-weight-bold'>Welcome, Nick Breslin.</div>
-                        <div class='font-weight-bold mb-3'>Group: Aldebaran</div>
+                        <div class='font-weight-bold mb-3'>Group: {{groupName}}</div>
                         <p class='p-0 m-0'>
                             In this survey, you will rate the performance of yourself and your team members for <strong>Assignment 1</strong>.
                         </p>
@@ -23,13 +23,15 @@
 </template>
 
 <script>
+
 export default {
-  name: 'Intro',
-  computed: {
-      title(){
-          return 'Assignment Title';
-      }
-  }
+    name: 'Intro',
+    computed: {
+        title(){
+              return 'Assignment Title';
+        },
+        groupName(){return this.$store.state.group.name;}
+    }
 }
 </script>
 
