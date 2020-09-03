@@ -1,35 +1,36 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 
-import Intro from '@/components/Intro';
-import Survey from '@/components/Survey';
-import Results from '@/components/Results';
+import Vs from '@/components/Vs';
+import Settings from '@/components/Settings';
 
 
 Vue.use(Router);
 
-//vue routes: intro | survey | results | unauthorized, ...use navigation guard hooks
+//...use navigation guard hooks?
 const router = new Router({
     routes: [
         {
             path: '/',
-            redirect : '/start'
+            redirect : '/vs'
         },
         {
-            path: '/start',
-            name: 'Intro',
-            component: Intro
+            path: '/vs',
+            name: 'Vs',
+            component: Vs
         },
         {
-            path: '/survey',
-            name: 'Survey',
-            component: Survey
-        },
-        {
-            path: '/results',
-            name: 'Results',
-            component: Results
+            path: '/settings',
+            name: 'Settings',
+            component: Settings
         }
+        /*
+        {
+            path: '/about',
+            name: 'About',
+            component: About
+        }
+         */
     ]
 });
 
