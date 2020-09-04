@@ -16,6 +16,11 @@ const difficulty =  {
         height: 16,
         width:  30,
         mines:  99
+    },
+    honkenhuge: {
+        height: 22,
+        width: 38,
+        mines: 175
     }
 }
 Vue.use(Vuex);
@@ -25,7 +30,7 @@ const store = new Vuex.Store({
         userId: 0,
         peerId: 1,
         seed: 69,
-        board: difficulty.expert,
+        board: difficulty.honkenhuge,
         mode: 'beginner' // beginner | intermediate | expert | custom 
     }),
     actions: {

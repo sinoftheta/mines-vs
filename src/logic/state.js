@@ -9,21 +9,17 @@ class Tile{
         this.flagged = false;
         this.owner = null;
         this.timestamp = 0;
-        
     }
 }
+
 export default class State{
-    constructor(height, width, mines, seed){
+    constructor(height, width, mines, seed, fake){
         this.width = width;
         this.height = height;
         this.mines = mines;
         this.rng = seedrandom(seed);
         this.board = [];
         
-        const rightmost = this.width - 1;
-        const bottom = this.height - 1;
-        const top = 0, leftmost = 0;
-
         // init board tiles
         for(let i = 0; i < width; ++i){
             this.board.push([]);
@@ -32,13 +28,42 @@ export default class State{
                 this.board[i][j] = new Tile();
             }
         }
-        this.placeMines();
-        this.placeNumbers();
-        
+        if(!fake){
+            this.placeMines();
+            this.placeNumbers();
+        }
     }
-    reveal(x,y,owner){
+    revealPoints(x,y,owner){
+        const target = this.board[x][y];
+        let points = 0;
 
-        return points; //points earned
+        //check if tile is revealed
+        if(target.revealed) return;
+
+        //reveal tile
+        target.revealed = true;
+        target.owner = owner;
+        points += target.value;
+
+        //return early & penalize if mine
+        if(target.isMine){
+            // mine penalty will need balancing
+            // cut points in half?
+            // lose points based on mine value?  
+            points -= 2 * target.value;
+        }
+
+        //check win condition
+        if(this.gameWon()) return points;
+
+        //if tile is a zero, recurse over all neighbors
+        if(target.value === 0){
+            this.neighbors(x,y).forEach(({i,j}) => {
+                points += this.revealPoints(i,j, owner);
+            });
+        }        
+
+        return points;
     }
     reclaimTiles(tiles){
 

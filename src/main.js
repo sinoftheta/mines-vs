@@ -9,6 +9,8 @@ import 'bootstrap/dist/css/bootstrap.css';
 import VueClipboard from 'vue-clipboard2';
 VueClipboard.config.autoSetContainer = true;
 
+document.body.onmousedown = function(e) { if (e.button === 1) return false; };
+
 Vue.use(VueClipboard);
 Vue.config.productionTip = false;
 

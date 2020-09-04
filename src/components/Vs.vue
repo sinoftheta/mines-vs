@@ -52,7 +52,7 @@ export default {
                 (e) => { //copy success
                     //alert('Copied!');
                     //console.log(e);
-                    console.log('copied!');
+                    //console.log('copied!');
                 }, 
                 (e) => { // copy failed
                     alert('Failed To Copy!');
@@ -71,8 +71,6 @@ export default {
             this.$store.state.board.height,
             this.$store.state.board.width,
             this.$store.state.board.mines,
-            this.$store.state.userId,
-            this.$store.state.peerId,
             (code) => this.setUserConnectCode(code)
             );
     }
