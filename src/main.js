@@ -6,6 +6,10 @@ import store from '@/store/store';
 import 'bootstrap/dist/css/bootstrap.css';
 //import 'bootswatch/dist/[theme]/bootstrap.min.css';
 
+import VueClipboard from 'vue-clipboard2';
+VueClipboard.config.autoSetContainer = true;
+
+Vue.use(VueClipboard);
 Vue.config.productionTip = false;
 
 new Vue({

@@ -1,5 +1,4 @@
 # Minesweeper Arena
-(TODO: link to matchmaker backend repo)
 
 Play new versions of minesweeper against your friends in real time. 
 
@@ -7,7 +6,7 @@ Single Board Versus: Clear more tiles than your opponent to win!
 
 Time Attack: Play on a sepeprate board with the same layout as your opponent. Clear your board first to win!
 
-made with:
+Made with:
 
 peerjs
 Vue

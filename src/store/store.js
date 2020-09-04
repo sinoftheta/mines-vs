@@ -4,18 +4,18 @@ import Vuex from 'vuex';
 const difficulty =  {
     beginner: {
         height: 10,
-        width: 10,
-        mines: 10,
+        width:  10,
+        mines:  10,
     },
     intermediate: {
-        heignt: 16,
-        width: 16,
-        mines: 40,
+        height: 16,
+        width:  16,
+        mines:  40
     },
     expert: {
         height: 16,
-        width: 30,
-        mines: 99
+        width:  30,
+        mines:  99
     }
 }
 Vue.use(Vuex);
@@ -25,7 +25,7 @@ const store = new Vuex.Store({
         userId: 0,
         peerId: 1,
         seed: 69,
-        board: difficulty.beginner,
+        board: difficulty.expert,
         mode: 'beginner' // beginner | intermediate | expert | custom 
     }),
     actions: {
