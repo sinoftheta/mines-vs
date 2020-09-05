@@ -4,7 +4,7 @@ import seedrandom from 'seedrandom';
 class Tile{
     constructor(){
         this.value = 0;
-        this.revealed = false;
+        this.revealed = true;
         this.isMine = false;
         this.flagged = false;
         this.owner = null;
