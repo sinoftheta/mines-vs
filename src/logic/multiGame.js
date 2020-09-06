@@ -109,10 +109,6 @@ export default class MultiGame{
                     type: start
                 })
                 this.startCountDown(countdownTime) //.then(startgame);
-
-                
-
-
         }
     }
     clientSwitch(data, conn){

@@ -1,6 +1,9 @@
 <template>
     <div>
         <div>versus</div>
+        <div>{{userScore}}</div>
+        <div>{{opponentScore}}</div>
+        <div>{{minesRemaining}}</div>
         <canvas ref="boardCanvas"></canvas>
         <div>
             <div>your connect code</div>
@@ -21,10 +24,6 @@
                 @input="setOpponentCode"
             >
         </div>
-        <div>
-            <input type="checkbox" id="autoReady" v-model="autoReady">
-            <label for="autoReady">auto ready</label>
-        </div>
         <Nav></Nav>
     </div>
 </template>
@@ -42,7 +41,9 @@ export default {
         return {
             userConnectCode: 'generating code...',
             opponentConnectCode: '',
-            autoReady: false,
+            userScore: 0,
+            opponentScore: 0,
+            minesRemaining: 0
     }},
     methods:{
         setUserConnectCode(code){

@@ -22,6 +22,10 @@ const theme = {
     mine: '#000000'
 }
 
+const leftMouse = 1;
+const rightMouse = 2;
+const middleMouse = 4;
+
 function xor(a,b) {
     return ( a ? 1 : 0 ) ^ ( b ? 1 : 0 );
 }
@@ -36,8 +40,10 @@ export default class Board{
         this.canvas.height = px * this.state.height;
         this.canvas.width  = px * this.state.width;
         this.ctx = this.canvas.getContext('2d');
-        this.canvas.onmousemove = (e) => {this.updateCursor(e)};
-        this.canvas.oncontextmenu = function(e) { e.preventDefault(); e.stopPropagation(); }
+        this.canvas.onmousemove = (e) => {this.mouseMove(e)};
+        this.canvas.onmousedown = (e) => {this.mouseDown(e)};
+        this.canvas.onmouseup   = (e) => {this.mouseUp(e)};
+        this.canvas.oncontextmenu = function(e) { e.preventDefault(); e.stopPropagation(); };
 
         this.prevX = -1;
         this.prevY = -1;
@@ -54,7 +60,7 @@ export default class Board{
         const state = this.state;
         const px = this.px;
 
-        ctx.lineWidth = 0;
+        ctx.lineWidth = 1;
         ctx.font = `${px * .6}px Impact`;
         ctx.textAlign = 'center';
 
@@ -79,8 +85,7 @@ export default class Board{
 
             if(this.state.board[i][j].isMine){
                 this.drawMine(i, j);
-            }
-            else{
+            }else{
                 this.drawValue(i, j, this.state.board[i][j].value);
             }
         }
@@ -144,13 +149,31 @@ export default class Board{
         if(!target.revealed || !(target.value == 0 || target.isMine)){
             ctx.beginPath();
             ctx.fillStyle = theme.hover;
-            ctx.strokeStyle = theme.hover;
+            //ctx.strokeStyle = theme.hover;
             ctx.rect(this.curX * px, this.curY * px, px, px);
             ctx.fill();
             ctx.stroke();
         }
     }
-    updateCursor(e){
+    anticipateRevealCur(){
+        if(this.curX < 0 || this.curY < 0) return;
+
+        const light = xor( this.curX % 2 == 0, this.curY % 2 == 0);
+        const target = this.state.board[this.curX][this.curY];
+        const ctx = this.ctx, px = this.px;
+        if(!target.revealed){
+            ctx.beginPath();
+            ctx.fillStyle = light ? theme.background1 : theme.background2;
+            //ctx.strokeStyle = light ? theme.background1 : theme.background2;
+            ctx.rect(this.curX * px, this.curY * px, px, px);
+            ctx.fill();
+            ctx.stroke();
+        }
+    }
+
+    // mouse behavior ...move to a different obj?
+    mouseMove(e){
+        //console.log(e.buttons);
         const rect = this.canvas.getBoundingClientRect();
         const x = Math.floor(Math.floor(e.clientX - rect.left) / this.px);
         const y = Math.floor(Math.floor(e.clientY - rect.top)  / this.px);
@@ -162,8 +185,32 @@ export default class Board{
             this.curY = y;
             this.curX = x;
 
-            this.highlightCur();
+            if(e.buttons & leftMouse){
+                this.anticipateRevealCur();
+            }
+            else{
+                this.highlightCur();
+            }
             this.drawTileState(this.prevX, this.prevY);
         }
+    }
+
+    mouseUp(e){
+        this.drawTileState(this.curX, this.curY);
+        this.highlightCur();
+        if(!this.real) return;
+        //somehow check that it was a left click up...?
+
+        console.log('up on', this.curX, this.curY);
+        //call click on x,y
+        this.submitClick(this.curX, this.curY)
+        .then(updatedTilesList =>{
+            //TODO: draw using list
+            //this.drawList(updatedTilesList);
+            this.drawAll();
+        });
+    }
+    mouseDown(e){
+        this.anticipateRevealCur();
     }
 }

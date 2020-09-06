@@ -1,9 +1,9 @@
-import Vue from 'vue';
-import Router from 'vue-router';
+import Vue      from 'vue';
+import Router   from 'vue-router';
 
-import Vs from '@/components/Vs';
+import Vs       from '@/components/Vs';
 import Settings from '@/components/Settings';
-
+import Single   from '@/components/Single';
 
 Vue.use(Router);
 
@@ -18,6 +18,18 @@ const router = new Router({
             path: '/vs',
             name: 'Vs',
             component: Vs
+        },
+        /*
+        {
+            path: '/race',
+            name: 'Race',
+            component: Race
+        },
+        */
+        {
+            path: '/solo',
+            name: 'Single',
+            component: Single
         },
         {
             path: '/settings',
