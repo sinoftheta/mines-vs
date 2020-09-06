@@ -14,26 +14,37 @@ const postgame     = 'postgame';
 */
 
 // transmission types:
-const handshake = 'handshake';
-const settings = 'settings'; 
-const settings_received = 'sr';
-const ready = 'ready'; //contains nothing
-const click = 'click'; // contains a tile coordinate
+const handshake = 'handshake'; //connection established
+const settings = 'settings';  //settings transmitted
+const standby = 'standby'; // waiting for players to be ready
+const start = 'start'; //signal countdown timer to begin
+const click = 'click';
 const realign = 'realign'; //contains a list of tile coords
 
+const countdownTime = 2000; // in ms
 // client states
 
 
 export default class MultiGame{
-    constructor(boardRef, height, width, mines, onIdGenerate){
+    constructor(
+        boardRef, 
+        height, 
+        width, 
+        mines,
+        onIdGenerate, //callback to display users connect code once it has been generated
+        startCountDown // returns a promise after countdown has started
+        ){
 
+        // save stuff
         this.height = height;
         this.width = width;
         this.mines = mines;
         this.boardRef = boardRef;
         this.boardState = new State(height, width, mines, 69, false);
         this.board = new Board(boardRef, this.boardState, 30, false);
+
         //this.onIdGenerate = onIdGenerate;
+        this.startCountDown = startCountDown;
 
         // Register with the peer server
         this.peer = new Peer({
@@ -60,38 +71,25 @@ export default class MultiGame{
 
             conn.on('open', () => {conn.send({type: handshake, ts: Date.now()});});
 
-            conn.on('data', (data) => {
-                console.log(`received from host:`, data);
-                this.clientSwitch(data, conn);
-            });
-
-
+            conn.on('data', (data) => this.clientSwitch(data, conn));
         });
-
-
-
     }
     set opponentCode(code){
         // start connection as host
-
         this.connectId = code;
-        console.log(`Connecting to ${code}... you are host!`);
         this.host = true;
+        console.log(`Connecting to ${code}... you are host!`); 
         this.conn = this.peer.connect(code);
-
         //this.conn.on('open', () => {});
 
-        this.conn.on('data', (data) => {
-            console.log(`received from client:`, data);
-            this.hostSwitch(data);
-        });
+        this.conn.on('data', (data) => this.hostSwitch(data));
 
     }
     hostSwitch(data){
+        console.log(data, 'tx time:', Date.now() - data.ts);
         switch(data.type){
             case handshake:
                 //init seed (& other settings)
-                console.log(`handshake received in ${Date.now() - data.ts}ms`);
                 this.seed = Math.floor(Math.random() * 9007199254740991);
                 this.conn.send({
                     ts: Date.now(),
@@ -101,13 +99,24 @@ export default class MultiGame{
                     width: this.width,
                     mines: this.mines
                 });
-
                 break;
-            case settings_received:
-                this.readyUser(); // then send ready
+            case standby:
+                this.hostReady = false;
+                this.clientReady = false;
+                this.setBoardSync();
+                this.conn.send({
+                    ts: Date.now(),
+                    type: start
+                })
+                this.startCountDown(countdownTime) //.then(startgame);
+
+                
+
+
         }
     }
     clientSwitch(data, conn){
+        console.log(data, 'tx time:', Date.now() - data.ts);
         switch(data.type){
             case settings:
                 //sync states
@@ -115,17 +124,18 @@ export default class MultiGame{
                 this.height = data.height;
                 this.width = data.width;
                 this.mines = data.mines;
-                console.log(`settings received in: ${Date.now() - data.ts}ms`);
-                conn.send({type: settings_received});
-                this.readyUser();
+                this.setBoardSync();
+                conn.send({type: standby, ts: Date.now()});
                 break;
+            case start:
+                this.startCountDown(countdownTime - (Date.now() - data.ts)) //.then(startgame);
+
         }
     }
-    readyUser(){
-        //prompt user for ready
+    setBoardSync(){
+        //resets the board with a syncronised state
         this.boardState = new State(this.height, this.width, this.mines, this.seed, true);
         this.board = new Board(this.boardRef, this.boardState, 30, true);
-        console.log('ready?');
     }
 
     

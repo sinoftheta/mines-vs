@@ -3,7 +3,7 @@
         <div>versus</div>
         <canvas ref="boardCanvas"></canvas>
         <div>
-            <div>connect code</div>
+            <div>your connect code</div>
             <input type="text" v-model="userConnectCode">
             <button type="button" @click="copyCode"> <!--{{copyStatus}} -->
                 <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-clipboard" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -13,12 +13,17 @@
             </button>
         </div>
         <div>
+            <div>opponent connect code</div>
             <input 
                 type="text" 
                 v-model="opponentConnectCode" 
-                placeholder="opponent code"
+                placeholder="paste code here"
                 @input="setOpponentCode"
             >
+        </div>
+        <div>
+            <input type="checkbox" id="autoReady" v-model="autoReady">
+            <label for="autoReady">auto ready</label>
         </div>
         <Nav></Nav>
     </div>
@@ -37,7 +42,7 @@ export default {
         return {
             userConnectCode: 'generating code...',
             opponentConnectCode: '',
-            //copyStatus: 'copy',
+            autoReady: false,
     }},
     methods:{
         setUserConnectCode(code){
@@ -60,10 +65,13 @@ export default {
                 }
             )
         },
-        setOpponentCode(e){
-            //console.log(e.target.value)
-            game.opponentCode = e.target.value;
+        setOpponentCode(e){game.opponentCode = e.target.value;},
+        startCountDown(time){
+            //spawn count down modal
+            //return promise
+            console.log('counting down:', time);
         }
+
     },
     mounted(){
         game = new MultiGame(
@@ -71,7 +79,8 @@ export default {
             this.$store.state.board.height,
             this.$store.state.board.width,
             this.$store.state.board.mines,
-            (code) => this.setUserConnectCode(code)
+            (code) => this.setUserConnectCode(code),
+            this.startCountDown
             );
     }
 

@@ -17,7 +17,7 @@ export default class State{
         this.width = width;
         this.height = height;
         this.mines = mines;
-        this.rng = seedrandom(seed);
+        this.rng = seedrandom(`${seed}${mines}${height}${width}`);
         this.board = [];
         
         // init board tiles
@@ -29,7 +29,6 @@ export default class State{
             }
         }
         if(real){
-            console.log('real board')
             this.placeMines();
             this.placeNumbers();
         }
