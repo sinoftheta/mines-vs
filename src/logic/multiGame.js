@@ -43,7 +43,7 @@ export default class MultiGame{
         });
         this.peer.on('open', (id) => {
             console.log('generated connection code:', id);
-            onIdGenerate(id);
+            if(onIdGenerate) onIdGenerate(id);
         });
         this.peer.on('error', (error) => {
             console.error(error);
@@ -51,29 +51,18 @@ export default class MultiGame{
 
         // Handle incoming data connection
         this.peer.on('connection', (conn) => {
+            // start connection as client
 
             console.log('incoming peer connection, you are client!');
 
             // host will update its state upon sending data
             this.host = false;
 
-            conn.on('open', () => {
-                conn.send({type: handshake, ts: date.now()});
-            });
+            conn.on('open', () => {conn.send({type: handshake, ts: Date.now()});});
 
             conn.on('data', (data) => {
                 console.log(`received from host:`, data);
-                switch(data.type){
-                    case settings:
-                        //sync states
-                        this.seed = data.seed;
-                        this.height = data.height;
-                        this.width = data.width;
-                        this.mines = data.mines;
-                        conn.send({type: settings_received});
-                        this.readyUser();
-                        break;
-                }
+                this.clientSwitch(data, conn);
             });
 
 
@@ -83,6 +72,8 @@ export default class MultiGame{
 
     }
     set opponentCode(code){
+        // start connection as host
+
         this.connectId = code;
         console.log(`Connecting to ${code}... you are host!`);
         this.host = true;
@@ -92,24 +83,43 @@ export default class MultiGame{
 
         this.conn.on('data', (data) => {
             console.log(`received from client:`, data);
-            switch(data.type){
-                case handshake:
-                    //init seed (& other settings)
-                    this.seed = Math.floor(Math.random() * 9007199254740991);
-                    this.conn.send({
-                        type: settings,
-                        seed: this.seed,
-                        height: this.height,
-                        width: this.width,
-                        mines: this.mines
-                    });
-                    break;
-                case settings_received:
-                    this.readyUser(); // then send ready
-
-            }
+            this.hostSwitch(data);
         });
 
+    }
+    hostSwitch(data){
+        switch(data.type){
+            case handshake:
+                //init seed (& other settings)
+                console.log(`handshake received in ${Date.now() - data.ts}ms`);
+                this.seed = Math.floor(Math.random() * 9007199254740991);
+                this.conn.send({
+                    ts: Date.now(),
+                    type: settings,
+                    seed: this.seed,
+                    height: this.height,
+                    width: this.width,
+                    mines: this.mines
+                });
+
+                break;
+            case settings_received:
+                this.readyUser(); // then send ready
+        }
+    }
+    clientSwitch(data, conn){
+        switch(data.type){
+            case settings:
+                //sync states
+                this.seed = data.seed;
+                this.height = data.height;
+                this.width = data.width;
+                this.mines = data.mines;
+                console.log(`settings received in: ${Date.now() - data.ts}ms`);
+                conn.send({type: settings_received});
+                this.readyUser();
+                break;
+        }
     }
     readyUser(){
         //prompt user for ready
@@ -117,5 +127,6 @@ export default class MultiGame{
         this.board = new Board(this.boardRef, this.boardState, 30, true);
         console.log('ready?');
     }
+
     
 }

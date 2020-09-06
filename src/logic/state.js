@@ -13,7 +13,7 @@ class Tile{
 }
 
 export default class State{
-    constructor(height, width, mines, seed, fake){
+    constructor(height, width, mines, seed, real){
         this.width = width;
         this.height = height;
         this.mines = mines;
@@ -28,7 +28,8 @@ export default class State{
                 this.board[i][j] = new Tile();
             }
         }
-        if(!fake){
+        if(real){
+            console.log('real board')
             this.placeMines();
             this.placeNumbers();
         }

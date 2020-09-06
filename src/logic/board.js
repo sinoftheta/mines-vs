@@ -24,7 +24,7 @@ const theme = {
 
 function xor(a,b) {
     return ( a ? 1 : 0 ) ^ ( b ? 1 : 0 );
-  }
+}
 
 export default class Board{
     constructor(canvasRef, gameState, px, real, versus){
@@ -46,6 +46,9 @@ export default class Board{
 
         this.drawAll();
     }
+    oob(x,y){ 
+        return x >= this.state.width || x < 0 || y >= this.state.height || y < 0;  
+    }
     drawAll(){
         const ctx = this.ctx;
         const state = this.state;
@@ -63,7 +66,7 @@ export default class Board{
     }
     drawTileState(i,j){
         //TODO: break into drawValue(x,y,n), drawMine(x,y), drawCover(x,y)
-        if(i < 0 || j < 0) return;
+        if(this.oob(i,j)) return;
 
         this.ctx.beginPath();
         this.ctx.rect(i * this.px, j * this.px, this.px, this.px);
