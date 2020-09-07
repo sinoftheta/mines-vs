@@ -7,25 +7,18 @@ export default class SingleGame{
         height, 
         width, 
         mines,
+        px
         ){
         // save stuff
         this.height = height;
         this.width = width;
         this.mines = mines;
         this.boardRef = boardRef;
-        this.boardState = new State(height, width, mines, Math.random(), true);
-        this.board = new Board(
-            boardRef, 
-            this.boardState, 
-            30, 
-            true, 
-            (x,y) => {
-                return new Promise(resolve => {
-                    this.leftClick(x,y);
-                    resolve();
-            })}
-        );
+        this.px = px;
+        this.boardState = new State(height, width, mines, 1, true);
+        this.board = new Board(boardRef, this.boardState, px, true, false, (x,y) => {this.leftClick(x,y);});
         this.firstClick = true;
+        this.points = 0;
         
 
         
@@ -37,6 +30,7 @@ export default class SingleGame{
             this.firstClick = false;
         }
         const points = this.boardState.revealPoints(x,y);
+        console.log(`scored: ${points}, total: ${this.points += points}`);
         if( points < 0){
             // game lost!
             // stop timer
@@ -45,6 +39,7 @@ export default class SingleGame{
 
         if(this.boardState.clear){
             // game won
+            console.log('game over!');
             return;
         }
     }

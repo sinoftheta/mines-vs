@@ -31,7 +31,7 @@ function xor(a,b) {
 }
 
 export default class Board{
-    constructor(canvasRef, gameState, px, real, versus){
+    constructor(canvasRef, gameState, px, real, versus, submitClick){
         this.real = real;
         this.versus = versus;
         this.state = gameState;
@@ -39,6 +39,7 @@ export default class Board{
         this.canvas = canvasRef;
         this.canvas.height = px * this.state.height;
         this.canvas.width  = px * this.state.width;
+        this.submitClick = (x,y) => {submitClick(x,y)};
         this.ctx = this.canvas.getContext('2d');
         this.canvas.onmousemove = (e) => {this.mouseMove(e)};
         this.canvas.onmousedown = (e) => {this.mouseDown(e)};
@@ -149,7 +150,7 @@ export default class Board{
         if(!target.revealed || !(target.value == 0 || target.isMine)){
             ctx.beginPath();
             ctx.fillStyle = theme.hover;
-            //ctx.strokeStyle = theme.hover;
+            ctx.strokeStyle = theme.hover;
             ctx.rect(this.curX * px, this.curY * px, px, px);
             ctx.fill();
             ctx.stroke();
@@ -164,7 +165,7 @@ export default class Board{
         if(!target.revealed){
             ctx.beginPath();
             ctx.fillStyle = light ? theme.background1 : theme.background2;
-            //ctx.strokeStyle = light ? theme.background1 : theme.background2;
+            ctx.strokeStyle = light ? theme.background1 : theme.background2;
             ctx.rect(this.curX * px, this.curY * px, px, px);
             ctx.fill();
             ctx.stroke();
@@ -185,13 +186,16 @@ export default class Board{
             this.curY = y;
             this.curX = x;
 
+            this.drawAll();
+
             if(e.buttons & leftMouse){
                 this.anticipateRevealCur();
             }
             else{
                 this.highlightCur();
             }
-            this.drawTileState(this.prevX, this.prevY);
+            //this.drawTileState(this.prevX, this.prevY);
+            
         }
     }
 
@@ -201,14 +205,11 @@ export default class Board{
         if(!this.real) return;
         //somehow check that it was a left click up...?
 
-        console.log('up on', this.curX, this.curY);
+        //console.log('up on', this.curX, this.curY);
         //call click on x,y
-        this.submitClick(this.curX, this.curY)
-        .then(updatedTilesList =>{
-            //TODO: draw using list
-            //this.drawList(updatedTilesList);
-            this.drawAll();
-        });
+        this.submitClick(this.curX, this.curY);
+        this.drawAll();
+        this.highlightCur();
     }
     mouseDown(e){
         this.anticipateRevealCur();

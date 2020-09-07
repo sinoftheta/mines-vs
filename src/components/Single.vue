@@ -28,6 +28,7 @@ export default {
             this.$store.state.board.height,
             this.$store.state.board.width,
             this.$store.state.board.mines,
+            35
             );
     }
 

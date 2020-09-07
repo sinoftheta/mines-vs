@@ -30,7 +30,7 @@ const store = new Vuex.Store({
         userId: 0,
         peerId: 1,
         seed: 69,
-        board: difficulty.expert,
+        board: difficulty.beginner,
         mode: 'beginner' // beginner | intermediate | expert | custom 
     }),
     actions: {

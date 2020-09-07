@@ -43,6 +43,13 @@ const router = new Router({
             component: About
         }
          */
+        /*
+        {
+            path: '/learn',
+            name: 'Tutorial',
+            component: Tutorial
+        }
+         */
     ]
 });
 

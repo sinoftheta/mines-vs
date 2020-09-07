@@ -31,8 +31,9 @@ export default class MultiGame{
         height, 
         width, 
         mines,
+        px,
         onIdGenerate, //callback to display users connect code once it has been generated
-        startCountDown // returns a promise after countdown has started
+        startCountDownUI // returns a promise after countdown has started
         ){
 
         // save stuff
@@ -40,11 +41,15 @@ export default class MultiGame{
         this.width = width;
         this.mines = mines;
         this.boardRef = boardRef;
+        this.px = px;
         this.boardState = new State(height, width, mines, 69, false);
-        this.board = new Board(boardRef, this.boardState, 30, false);
+        this.board = new Board(boardRef, this.boardState, px, false, false, () => {});
 
         //this.onIdGenerate = onIdGenerate;
-        this.startCountDown = startCountDown;
+        this.startCountDownUI = startCountDownUI;
+
+        this.userPoints = 0;
+        this.opponentPoints = 0;
 
         // Register with the peer server
         this.peer = new Peer({
@@ -66,12 +71,14 @@ export default class MultiGame{
 
             console.log('incoming peer connection, you are client!');
 
+            this.conn = conn; // save conn???
+
             // host will update its state upon sending data
             this.host = false;
 
-            conn.on('open', () => {conn.send({type: handshake, ts: Date.now()});});
+            this.conn.on('open', () => {conn.send({type: handshake, ts: Date.now()});});
 
-            conn.on('data', (data) => this.clientSwitch(data, conn));
+            this.conn.on('data', (data) => this.clientSwitch(data));
         });
     }
     set opponentCode(code){
@@ -108,10 +115,11 @@ export default class MultiGame{
                     ts: Date.now(),
                     type: start
                 })
-                this.startCountDown(countdownTime) //.then(startgame);
+                this.startCountDownUI(countdownTime)
+                setTimeout(this.startGame, countdownTime);
         }
     }
-    clientSwitch(data, conn){
+    clientSwitch(data){
         console.log(data, 'tx time:', Date.now() - data.ts);
         switch(data.type){
             case settings:
@@ -121,18 +129,33 @@ export default class MultiGame{
                 this.width = data.width;
                 this.mines = data.mines;
                 this.setBoardSync();
-                conn.send({type: standby, ts: Date.now()});
+                this.conn.send({type: standby, ts: Date.now()}); // DO THIS WORK???? this.
                 break;
             case start:
-                this.startCountDown(countdownTime - (Date.now() - data.ts)) //.then(startgame);
+                const adjustedCountTime = countdownTime - (Date.now() - data.ts);
+                this.startCountDownUI(adjustedCountTime) 
+                setTimeout(this.startGame, adjustedCountTime);
 
         }
     }
     setBoardSync(){
         //resets the board with a syncronised state
         this.boardState = new State(this.height, this.width, this.mines, this.seed, true);
-        this.board = new Board(this.boardRef, this.boardState, 30, true);
+        this.board = new Board(this.boardRef, this.boardState, this.px, true, true, (x,y) => {this.usuerLeftClick(x,y);});
     }
+    startGame(){// also do more?
+        console.log('go!');
+        this.gameActive = true;
+    }
+    userLeftClick(x,y){
+        if(!this.gameActive) return;
+
+
+        const points = this.boardState.revealPoints(x,y);
+        console.log(`you scored: ${points}, your total: ${this.userPoints += points}`);
+
+    }
+
 
     
 }

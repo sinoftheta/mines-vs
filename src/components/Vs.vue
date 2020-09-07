@@ -69,7 +69,6 @@ export default {
         setOpponentCode(e){game.opponentCode = e.target.value;},
         startCountDown(time){
             //spawn count down modal
-            //return promise
             console.log('counting down:', time);
         }
 
@@ -80,6 +79,7 @@ export default {
             this.$store.state.board.height,
             this.$store.state.board.width,
             this.$store.state.board.mines,
+            35,
             (code) => this.setUserConnectCode(code),
             this.startCountDown
             );
