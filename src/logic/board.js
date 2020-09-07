@@ -174,6 +174,7 @@ export default class Board{
 
     // mouse behavior ...move to a different obj?
     mouseMove(e){
+        //if(this.versus) this.drawAll();
         //console.log(e.buttons);
         const rect = this.canvas.getBoundingClientRect();
         const x = Math.floor(Math.floor(e.clientX - rect.left) / this.px);

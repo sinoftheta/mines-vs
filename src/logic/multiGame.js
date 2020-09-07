@@ -3,6 +3,8 @@ import Board from '@/logic/board';
 import Peer from 'peerjs';
 
 //https://glitch.com/edit/#!/peerjs-video?path=public%2Fmain.js%3A1%3A0
+// NOT WORKING ON LOCAL NETWORK FIX
+//https://github.com/peers/peerjs/issues/608
 
 // connection states?
 /*const noConnection = 'noConnection';
@@ -70,14 +72,9 @@ export default class MultiGame{
             // start connection as client
 
             console.log('incoming peer connection, you are client!');
-
-            this.conn = conn; // save conn???
-
-            // host will update its state upon sending data
+            this.conn = conn;
             this.host = false;
-
-            this.conn.on('open', () => {conn.send({type: handshake, ts: Date.now()});});
-
+            this.conn.on('open', () => { console.log('sending handshake'); this.conn.send({type: handshake, ts: Date.now()});});
             this.conn.on('data', (data) => this.clientSwitch(data));
         });
     }
@@ -147,14 +144,13 @@ export default class MultiGame{
     setBoardSync(){
         //resets the board with a syncronised state
         this.boardState = new State(this.height, this.width, this.mines, this.seed, true);
-        this.board = new Board(this.boardRef, this.boardState, this.px, true, true, (x,y) => {console.log('tf man'); this.userLeftClick(x,y);});
+        this.board = new Board(this.boardRef, this.boardState, this.px, true, true, (x,y) => {this.userLeftClick(x,y);});
     }
     startGame(){// also do more?
         console.log('go!');
         this.gameActive = true;
     }
     userLeftClick(x,y){
-        console.log('hellooooooo?')
         //if(!this.gameActive) return;
         const points = this.boardState.revealPoints(x,y);
         this.conn.send({
@@ -171,6 +167,7 @@ export default class MultiGame{
 
         //update board
         const points = this.boardState.revealPoints(x,y);
+        this.board.drawAll();
 
 
     }

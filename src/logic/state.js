@@ -96,7 +96,7 @@ export default class State{
             if(a.y > b.y) return 1;
             return -1; 
         });
-        console.log(this.mineList);
+        //console.log(this.mineList);
     }
     placeNumbers(){
         for(let i = 0; i < this.width; ++i){
