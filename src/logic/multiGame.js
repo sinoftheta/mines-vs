@@ -23,7 +23,7 @@ const start = 'start'; //signal countdown timer to begin
 const leftClick = 'lclick';
 const realign = 'realign'; //contains a list of tile coords
 
-const countdownTime = 2000; // in ms
+const countdownTime = 100; // in ms
 // client states
 
 
@@ -152,7 +152,7 @@ export default class MultiGame{
     }
     userLeftClick(x,y){
         //if(!this.gameActive) return;
-        const points = this.boardState.revealPoints(x,y);
+        const points = this.boardState.revealPoints(x,y, this.host);
         this.conn.send({
             ts: Date.now(), 
             type: leftClick,
@@ -166,7 +166,7 @@ export default class MultiGame{
         // send overlap command if needed
 
         //update board
-        const points = this.boardState.revealPoints(x,y);
+        const points = this.boardState.revealPoints(x,y, !this.host);
         this.board.drawAll();
 
 

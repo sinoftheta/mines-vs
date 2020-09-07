@@ -5,9 +5,13 @@ const theme = {
     border: '#808080',
     background1: '#c0c0c0',
     background2: '#c8c8c8',
+    p1Background1: '#dfc0c0',
+    p1Background2: '#dfc8c8',
+    p2Background1: '#c0c0df',
+    p2Background2: '#c8c8df',
     cover1: '#474798',
     cover2: '#5050a5',
-    coverBorder: '#424280',
+    coverBorder: '#404080',
     _1: '#0000f0',
     _2: '#008000',
     _3: '#f00000',
@@ -95,8 +99,16 @@ export default class Board{
         const light = xor( x % 2 == 0, y % 2 == 0);
 
         // draw revealed cell
-        this.ctx.fillStyle = light ? theme.background1 : theme.background2;
-        this.ctx.strokeStyle = light ? theme.background1 : theme.background2;
+        if(this.versus && this.state.board[x][y].owner){
+            this.ctx.fillStyle = light ? theme.p1Background1 : theme.p1Background2;
+        }
+        else if(this.versus && !this.state.board[x][y].owner){
+            this.ctx.fillStyle = light ? theme.p2Background1 : theme.p2Background2;
+        }
+        else{
+            this.ctx.fillStyle = light ? theme.background1 : theme.background2;
+        }
+        this.ctx.strokeStyle = this.ctx.fillStyle;
         this.ctx.fill();
         this.ctx.stroke();
     }
@@ -123,23 +135,39 @@ export default class Board{
         const px = this.px;
         //draw covered cell
         ctx.strokeStyle = light ? theme.cover1 : theme.cover2;
-        ctx.fillStyle =  light ? theme.cover1 : theme.cover2;
+        ctx.fillStyle = ctx.strokeStyle;
         ctx.fill();
         ctx.stroke();
 
-        /*
+        
+        /* 
         //draw edges based on empty neighbors
-        // upper left coords: x * px, y * px
+        //logic is fine, drawing lines is glitchy
         ctx.beginPath();
-        ctx.strokeStyle = '#ff0000'//theme.coverBorder;
-        ctx.lineWidth = 5;
+        ctx.strokeStyle = theme.coverBorder;
+        ctx.lineWidth = 1;
         if(x + 1 < this.state.height && this.state.board[x + 1][y].revealed){
-            //draw east (x+) boarder
+            //draw east (x) boarder
             ctx.moveTo((x + 1) * px, y * px);
-            ctx.lineTo((x + 1) * px, y * px);
+            ctx.lineTo((x + 1) * px, (y + 1) * px);
+        }
+        if(x - 1 > 0 && this.state.board[x - 1][y].revealed){
+            //draw west boarder
+            ctx.moveTo(x * px, y * px);
+            ctx.lineTo(x * px, (y + 1) * px);
+        }
+        if(y + 1 < this.state.height && this.state.board[x][y + 1].revealed){
+            //draw north boarder
+            ctx.moveTo((x + 1) * px, (y + 1) * px);
+            ctx.lineTo(x * px,       (y + 1) * px);
+        }
+        if(y - 1 > 0 && this.state.board[x][y - 1].revealed){
+            //draw south boarder
+            ctx.moveTo((x + 1) * px, y * px);
+            ctx.lineTo(x * px,       y * px);
         }
         ctx.stroke();
-        ctx.lineWidth = 0;
+        ctx.lineWidth = 1;
         */
     }
     highlightCur(){
@@ -150,7 +178,7 @@ export default class Board{
         if(!target.revealed || !(target.value == 0 || target.isMine)){
             ctx.beginPath();
             ctx.fillStyle = theme.hover;
-            ctx.strokeStyle = theme.hover;
+            ctx.strokeStyle = ctx.fillStyle;
             ctx.rect(this.curX * px, this.curY * px, px, px);
             ctx.fill();
             ctx.stroke();
@@ -165,7 +193,7 @@ export default class Board{
         if(!target.revealed){
             ctx.beginPath();
             ctx.fillStyle = light ? theme.background1 : theme.background2;
-            ctx.strokeStyle = light ? theme.background1 : theme.background2;
+            ctx.strokeStyle = ctx.fillStyle;
             ctx.rect(this.curX * px, this.curY * px, px, px);
             ctx.fill();
             ctx.stroke();
