@@ -54,11 +54,18 @@ export default class MultiGame{
         this.opponentPoints = 0;
 
         // Register with the peer server
-        this.peer = new Peer({
-            host: process.env.VUE_APP_PEER_SERVER,
-            port: process.env.VUE_APP_PORT || 8082,
-            path: '/'
-        });
+        if(process.env.VUE_APP_USE_PUBLIC_PEERJS){
+            this.peer = new Peer({});
+        }
+        else{
+            this.peer = new Peer({
+                host: process.env.VUE_APP_PEER_SERVER,
+                port: process.env.VUE_APP_PORT || 8082,
+                path: '/'
+            });
+        }
+
+        
         this.peer.on('open', (id) => {
             console.log('generated connection code:', id);
             if(onIdGenerate) onIdGenerate(id);

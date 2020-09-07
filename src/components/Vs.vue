@@ -1,9 +1,9 @@
 <template>
     <div>
         <div>versus</div>
-        <div>{{userScore}}</div>
+        <!--div>{{userScore}}</div>
         <div>{{opponentScore}}</div>
-        <div>{{minesRemaining}}</div>
+        <div>{{minesRemaining}}</div-->
         <canvas ref="boardCanvas"></canvas>
         <div>
             <div>your connect code</div>
