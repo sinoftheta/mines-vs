@@ -21,3 +21,7 @@ new Vue({
     this.$store.dispatch('init');
   }
 }).$mount('#app');
+
+
+console.log(process.env);
+

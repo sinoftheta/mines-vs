@@ -10,7 +10,11 @@ const { ExpressPeerServer } = require("peer");
 const app = express();
 app.use(cors());
 
-const port = process.env.PORT | 8082;
+
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
+const port = process.env.VUE_APP_PORT || 8082;
 
 
 // make all the files in 'public' available
@@ -30,7 +34,7 @@ const listener = app.listen(port, () => {
 // peerjs server
 const peerServer = ExpressPeerServer(listener, {
   debug: true,
-  path: '/direct'
+  path: '/'
 });
 
 app.use('/', peerServer);

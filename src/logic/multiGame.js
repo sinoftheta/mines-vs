@@ -18,7 +18,7 @@ const handshake = 'handshake'; //connection established
 const settings = 'settings';  //settings transmitted
 const standby = 'standby'; // waiting for players to be ready
 const start = 'start'; //signal countdown timer to begin
-const click = 'click';
+const leftClick = 'lclick';
 const realign = 'realign'; //contains a list of tile coords
 
 const countdownTime = 2000; // in ms
@@ -53,9 +53,9 @@ export default class MultiGame{
 
         // Register with the peer server
         this.peer = new Peer({
-            host: 'localhost',
-            port: '8082',
-            path: '/direct'
+            host: process.env.VUE_APP_PEER_SERVER,
+            port: process.env.VUE_APP_PORT || 8082,
+            path: '/'
         });
         this.peer.on('open', (id) => {
             console.log('generated connection code:', id);
@@ -90,7 +90,6 @@ export default class MultiGame{
         //this.conn.on('open', () => {});
 
         this.conn.on('data', (data) => this.hostSwitch(data));
-
     }
     hostSwitch(data){
         console.log(data, 'tx time:', Date.now() - data.ts);
@@ -117,6 +116,10 @@ export default class MultiGame{
                 })
                 this.startCountDownUI(countdownTime)
                 setTimeout(this.startGame, countdownTime);
+                break;
+            case leftClick:
+                this.opponentLeftClick(data.x, data.y);
+
         }
     }
     clientSwitch(data){
@@ -135,24 +138,40 @@ export default class MultiGame{
                 const adjustedCountTime = countdownTime - (Date.now() - data.ts);
                 this.startCountDownUI(adjustedCountTime) 
                 setTimeout(this.startGame, adjustedCountTime);
+                break;
+            case leftClick:
+                this.opponentLeftClick(data.x, data.y);
 
         }
     }
     setBoardSync(){
         //resets the board with a syncronised state
         this.boardState = new State(this.height, this.width, this.mines, this.seed, true);
-        this.board = new Board(this.boardRef, this.boardState, this.px, true, true, (x,y) => {this.usuerLeftClick(x,y);});
+        this.board = new Board(this.boardRef, this.boardState, this.px, true, true, (x,y) => {console.log('tf man'); this.userLeftClick(x,y);});
     }
     startGame(){// also do more?
         console.log('go!');
         this.gameActive = true;
     }
     userLeftClick(x,y){
-        if(!this.gameActive) return;
-
-
+        console.log('hellooooooo?')
+        //if(!this.gameActive) return;
         const points = this.boardState.revealPoints(x,y);
+        this.conn.send({
+            ts: Date.now(), 
+            type: leftClick,
+            x,
+            y
+        });
         console.log(`you scored: ${points}, your total: ${this.userPoints += points}`);
+    }
+    opponentLeftClick(x,y){
+        // check for overlap. i.e. if need to rollback
+        // send overlap command if needed
+
+        //update board
+        const points = this.boardState.revealPoints(x,y);
+
 
     }
 
