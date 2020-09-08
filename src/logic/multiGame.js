@@ -4,7 +4,7 @@ import Peer from 'peerjs';
 
 //https://glitch.com/edit/#!/peerjs-video?path=public%2Fmain.js%3A1%3A0
 // NOT WORKING ON LOCAL NETWORK FIX
-//https://github.com/peers/peerjs/issues/608
+//   https://github.com/peers/peerjs/issues/608#issuecomment-567045127
 
 // connection states?
 /*const noConnection = 'noConnection';
@@ -21,9 +21,11 @@ const settings = 'settings';  //settings transmitted
 const standby = 'standby'; // waiting for players to be ready
 const start = 'start'; //signal countdown timer to begin
 const leftClick = 'lclick';
+const ping = 'ping';
 const realign = 'realign'; //contains a list of tile coords
 
-const countdownTime = 100; // in ms
+const pingInterval = 1000; // ms
+const countdownTime = 100; // ms
 // client states
 
 
@@ -56,7 +58,7 @@ export default class MultiGame{
         // Register with the peer server
         if(process.env.VUE_APP_USE_PUBLIC_PEERJS){
             this.peer = new Peer({
-                debug: 3,
+                debug:  Number(process.env.VUE_APP_PEER_DEBUG_LEVEL)
             });
         }
         else{
@@ -64,7 +66,7 @@ export default class MultiGame{
                 host: process.env.VUE_APP_PEER_SERVER,
                 port: process.env.VUE_APP_PORT || 8082,
                 path: '/',
-                debug: 3
+                debug: Number(process.env.VUE_APP_PEER_DEBUG_LEVEL)
             });
         }
 
@@ -84,7 +86,13 @@ export default class MultiGame{
             console.log('incoming peer connection, you are client!');
             this.conn = conn;
             this.host = false;
-            this.conn.on('open', () => { console.log('sending handshake'); this.conn.send({type: handshake, ts: Date.now()});});
+            this.conn.on('open', () => { 
+                console.log('sending handshake'); 
+                this.conn.send({type: handshake});
+
+                // start pinging
+                this.handlePing(); 
+            });
             this.conn.on('data', (data) => this.clientSwitch(data));
         });
     }
@@ -99,13 +107,11 @@ export default class MultiGame{
         this.conn.on('data', (data) => this.hostSwitch(data));
     }
     hostSwitch(data){
-        console.log(data, 'tx time:', Date.now() - data.ts);
         switch(data.type){
             case handshake:
                 //init seed (& other settings)
                 this.seed = Math.floor(Math.random() * 9007199254740991);
                 this.conn.send({
-                    ts: Date.now(),
                     type: settings,
                     seed: this.seed,
                     height: this.height,
@@ -117,20 +123,20 @@ export default class MultiGame{
                 this.hostReady = false;
                 this.clientReady = false;
                 this.setBoardSync();
-                this.conn.send({
-                    ts: Date.now(),
-                    type: start
-                })
+                this.conn.send({type: start});
                 this.startCountDownUI(countdownTime)
                 setTimeout(this.startGame, countdownTime);
                 break;
             case leftClick:
                 this.opponentLeftClick(data.x, data.y);
+                break;
+            case ping:
+                this.handlePing();
+                break;
 
         }
     }
     clientSwitch(data){
-        console.log(data, 'tx time:', Date.now() - data.ts);
         switch(data.type){
             case settings:
                 //sync states
@@ -139,17 +145,29 @@ export default class MultiGame{
                 this.width = data.width;
                 this.mines = data.mines;
                 this.setBoardSync();
-                this.conn.send({type: standby, ts: Date.now()}); // DO THIS WORK???? this.
+                this.conn.send({type: standby}); // DO THIS WORK???? this.
                 break;
             case start:
-                const adjustedCountTime = countdownTime - (Date.now() - data.ts);
+                const adjustedCountTime = countdownTime; // - prevrtt / 2 
                 this.startCountDownUI(adjustedCountTime) 
                 setTimeout(this.startGame, adjustedCountTime);
                 break;
             case leftClick:
                 this.opponentLeftClick(data.x, data.y, data.ts);
+                break;
+            case ping:
+                this.handlePing();
+                break;
+
 
         }
+    }
+    handlePing(){
+        if(this.prevPingTs){
+            console.log(`rtt: ` + `%c${(Date.now() - this.prevPingTs - 2 * pingInterval)}` + `%cms`, 'color:green', 'color: white');
+        }
+        setTimeout(() => this.conn.send({type: ping}), pingInterval);
+        this.prevPingTs = Date.now();
     }
     setBoardSync(){
         //resets the board with a syncronised state
@@ -164,7 +182,6 @@ export default class MultiGame{
         //if(!this.gameActive) return;
         const points = this.boardState.revealPoints(x,y, this.host);
         this.conn.send({
-            ts: Date.now(), 
             type: leftClick,
             x,
             y
@@ -186,8 +203,6 @@ export default class MultiGame{
         //update board
         const points = this.boardState.revealPoints(x,y, !this.host);
         this.board.drawAll();
-
-
     }
 
 
