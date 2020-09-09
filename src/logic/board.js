@@ -13,8 +13,10 @@ const theme = {
     cover2: '#5050a5',
     revealFlagCover1: '#8484AC', //'#2c2c8a',
     revealFlagCover2: '#8C8CB7', //'#30309c',
-    flagFill: '#e0345f',
-    flagStroke: '#ab1a3e',
+    p1FlagFill: '#e0345f',
+    p1FlagStroke: '#ab1a3e',
+    p2FlagFill: '#34c6e0', 
+    p2FlagStroke: '#239dc2',
     coverBorder: '#404080',
     _1: '#0000f0',
     _2: '#008000',
@@ -132,8 +134,8 @@ export default class Board{
     drawFlag(x,y){
         const ctx = this.ctx;
         const px = this.px;
-        ctx.fillStyle   = theme.flagFill;
-        ctx.strokeStyle = theme.flagStroke;
+        ctx.fillStyle   = theme.p2FlagFill;
+        ctx.strokeStyle = theme.p2FlagStroke;
         ctx.lineWidth = 2;
         ctx.beginPath();
 
