@@ -28,16 +28,22 @@ export default class SingleGame{
         );
         this.firstClick = true;
         this.points = 0;
-        
-
-        
     }
     leftClick(x,y){
+
+        //dont reveal flagged tiles
+        if(this.boardState.board[x][y].flagged){
+            return;
+        } 
+
+        // keep track of first game click
         if(this.firstClick){
             // redistribute mines around x,y
             // start timer
             this.firstClick = false;
         }
+
+        // recursive reveal, get points awarded for reveal
         const points = this.boardState.revealPoints(x,y);
         console.log(`scored: ${points}, total: ${this.points += points}`);
         if( points < 0){
@@ -53,14 +59,10 @@ export default class SingleGame{
         }
     }
     flag(x,y){
-        console.log('attempting to flag');
         const target = this.boardState.board[x][y];
-        
         if(!target.revealed){
-            console.log('flagging');
             target.flagged = !target.flagged;
         }
-        console.log(target);
     }
     choord(x,y){
 

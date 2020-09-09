@@ -11,6 +11,8 @@ const theme = {
     p2Background2: '#c8c8df',
     cover1: '#474798',
     cover2: '#5050a5',
+    revealFlagCover1: '#8484AC', //'#2c2c8a',
+    revealFlagCover2: '#8C8CB7', //'#30309c',
     flagFill: '#e0345f',
     flagStroke: '#ab1a3e',
     coverBorder: '#404080',
@@ -223,11 +225,16 @@ export default class Board{
         const ctx = this.ctx, px = this.px;
         if(!target.revealed){
             ctx.beginPath();
-            ctx.fillStyle = light ? theme.background1 : theme.background2;
+
+            if(target.flagged) ctx.fillStyle = light ? theme.revealFlagCover1 : theme.revealFlagCover2;
+            else               ctx.fillStyle = light ? theme.background1 : theme.background2;
+
             ctx.strokeStyle = ctx.fillStyle;
             ctx.rect(x * px, y * px, px, px);
             ctx.fill();
             ctx.stroke();
+
+            if(target.flagged) this.drawFlag(x,y);
         }
     }
     anticipateChord(){
