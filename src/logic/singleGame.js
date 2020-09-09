@@ -16,7 +16,16 @@ export default class SingleGame{
         this.boardRef = boardRef;
         this.px = px;
         this.boardState = new State(height, width, mines, 1, true);
-        this.board = new Board(boardRef, this.boardState, px, true, false, (x,y) => {this.leftClick(x,y);});
+        this.board = new Board(
+            boardRef, 
+            this.boardState, 
+            px, 
+            true, 
+            false, 
+            (x,y) => {this.leftClick(x,y);},
+            (x,y) => {     this.flag(x,y);},
+            (x,y) => {    this.chord(x,y);}
+        );
         this.firstClick = true;
         this.points = 0;
         
@@ -42,5 +51,18 @@ export default class SingleGame{
             console.log('game over!');
             return;
         }
+    }
+    flag(x,y){
+        console.log('attempting to flag');
+        const target = this.boardState.board[x][y];
+        
+        if(!target.revealed){
+            console.log('flagging');
+            target.flagged = !target.flagged;
+        }
+        console.log(target);
+    }
+    choord(x,y){
+
     }
 }

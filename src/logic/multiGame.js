@@ -187,6 +187,12 @@ export default class MultiGame{
             y
         });
         console.log(`you scored: ${points}, your total: ${this.userPoints += points}`);
+
+        if(this.boardState.clear){
+            // game won
+            console.log('game over!');
+            return;
+        }
     }
     opponentLeftClick(x,y, ts){
         // check for overlap. i.e. if need to rollback
@@ -203,6 +209,13 @@ export default class MultiGame{
         //update board
         const points = this.boardState.revealPoints(x,y, !this.host);
         this.board.drawAll();
+        this.board.highlightCur();
+
+        if(this.boardState.clear){
+            // game won
+            console.log('game over!');
+            return;
+        }
     }
 
 

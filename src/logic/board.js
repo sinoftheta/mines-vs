@@ -11,6 +11,8 @@ const theme = {
     p2Background2: '#c8c8df',
     cover1: '#474798',
     cover2: '#5050a5',
+    flagFill: '#e0345f',
+    flagStroke: '#ab1a3e',
     coverBorder: '#404080',
     _1: '#0000f0',
     _2: '#008000',
@@ -26,28 +28,37 @@ const theme = {
     mine: '#000000'
 }
 
+const none = 0;
 const leftMouse = 1;
 const rightMouse = 2;
 const middleMouse = 4;
+
+
+// flag triangle constants
+const scale = 0.65; // ratio of triangle sidelength to tile sidelength 
+const r3o2 = 0.86602540378; // sqrt(3) / 2. height of equalateral triangle
+const x_off = (1 - scale * r3o2) * 0.5;
 
 function xor(a,b) {
     return ( a ? 1 : 0 ) ^ ( b ? 1 : 0 );
 }
 
 export default class Board{
-    constructor(canvasRef, gameState, px, real, versus, submitClick){
+    constructor(canvasRef, gameState, px, real, versus, submitClick, submitFlag, submitChord){
         this.real = real;
         this.versus = versus;
         this.state = gameState;
         this.px = px;
         this.canvas = canvasRef;
+        this.ctx = this.canvas.getContext('2d');
         this.canvas.height = px * this.state.height;
         this.canvas.width  = px * this.state.width;
-        this.submitClick = (x,y) => {submitClick(x,y)};
-        this.ctx = this.canvas.getContext('2d');
-        this.canvas.onmousemove = (e) => {this.mouseMove(e)};
-        this.canvas.onmousedown = (e) => {this.mouseDown(e)};
-        this.canvas.onmouseup   = (e) => {this.mouseUp(e)};
+        this.submitClick  = (x,y) => { submitClick(x,y); };
+        this.submitFlag   = (x,y) => { submitFlag(x,y);  };
+        this.submitChord  = (x,y) => { console.log('submitting chord');/*submitChord(x,y)*/};
+        this.canvas.onmousemove = (e) => { this.mouseMove(e) };
+        this.canvas.onmousedown = (e) => { this.mouseDown(e) };
+        this.canvas.onmouseup   = (e) => { this.mouseUp(e)   };
         this.canvas.oncontextmenu = function(e) { e.preventDefault(); e.stopPropagation(); };
 
         this.prevX = -1;
@@ -83,8 +94,12 @@ export default class Board{
         this.ctx.rect(i * this.px, j * this.px, this.px, this.px);
 
         if(!this.state.board[i][j].revealed){
-            this.drawCover(i, j);
+            this.drawCover(i,j);
 
+            if(this.state.board[i][j].flagged){
+                this.drawFlag(i,j);
+            }
+        
         }else{
             this.drawBackground(i,j);
 
@@ -112,6 +127,24 @@ export default class Board{
         this.ctx.fill();
         this.ctx.stroke();
     }
+    drawFlag(x,y){
+        const ctx = this.ctx;
+        const px = this.px;
+        ctx.fillStyle   = theme.flagFill;
+        ctx.strokeStyle = theme.flagStroke;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+
+        ctx.moveTo( (x + x_off) * px ,     (  y + (1 - scale) * 0.5) * px ); // top left triangle point
+        ctx.lineTo( (x + x_off) * px ,     ( (y + 1 - (1 - scale) * 0.5)) * px ); // bottom left triangle point
+        ctx.lineTo( (x + 1 - x_off) * px , ( y + 0.5) * px ); // right triangle point
+        ctx.lineTo( (x + x_off) * px ,     ( y + (1 - scale) * 0.5) * px ); // back to origin
+
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.lineWidth = 1;
+    }
     drawValue(x,y,n){
         this.ctx.fillStyle = theme['_' + n];
         this.ctx.fillText(n, (x + 0.5) * this.px, (y + 0.5) * this.px + 7);
@@ -120,7 +153,7 @@ export default class Board{
         //draw mine
         this.ctx.beginPath();
         this.ctx.fillStyle = theme.mine;
-        this.ctx.lineWidth = 0;
+        //this.ctx.lineWidth = 0;
         this.ctx.arc(
             (x + 0.5) * this.px, 
             (y + 0.5) * this.px, 
@@ -128,7 +161,7 @@ export default class Board{
             0, 
             2 * Math.PI);
         this.ctx.fill();
-    } 
+    }
     drawCover(x,y){
         const ctx = this.ctx;
         const light = xor( x % 2 == 0, y % 2 == 0);
@@ -171,8 +204,6 @@ export default class Board{
         */
     }
     highlightCur(){
-        if(this.curX < 0 || this.curY < 0) return;
-
         const target = this.state.board[this.curX][this.curY];
         const ctx = this.ctx, px = this.px;
         if(!target.revealed || !(target.value == 0 || target.isMine)){
@@ -184,26 +215,35 @@ export default class Board{
             ctx.stroke();
         }
     }
-    anticipateRevealCur(){
-        if(this.curX < 0 || this.curY < 0) return;
+    anticipateReveal(x,y){
+        if(this.oob(x,y)) return;
 
-        const light = xor( this.curX % 2 == 0, this.curY % 2 == 0);
-        const target = this.state.board[this.curX][this.curY];
+        const light = xor( x % 2 == 0, y % 2 == 0);
+        const target = this.state.board[x][y];
         const ctx = this.ctx, px = this.px;
         if(!target.revealed){
             ctx.beginPath();
             ctx.fillStyle = light ? theme.background1 : theme.background2;
             ctx.strokeStyle = ctx.fillStyle;
-            ctx.rect(this.curX * px, this.curY * px, px, px);
+            ctx.rect(x * px, y * px, px, px);
             ctx.fill();
             ctx.stroke();
+        }
+    }
+    anticipateChord(){
+        if(this.oob(this.curX, this.curY)) return;
+        this.anticipateReveal(this.curX, this.curY);
+        for( let {x,y} of this.state.neighbors(this.curX, this.curY)){
+            if(!this.state.board[x][y].revealed){
+                this.anticipateReveal(x,y);
+            }
         }
     }
 
     // mouse behavior ...move to a different obj?
     mouseMove(e){
-        //if(this.versus) this.drawAll();
-        //console.log(e.buttons);
+
+        this.recordButtonsPressed(e.buttons);
         const rect = this.canvas.getBoundingClientRect();
         const x = Math.floor(Math.floor(e.clientX - rect.left) / this.px);
         const y = Math.floor(Math.floor(e.clientY - rect.top)  / this.px);
@@ -217,30 +257,63 @@ export default class Board{
 
             this.drawAll();
 
-            if(e.buttons & leftMouse){
-                this.anticipateRevealCur();
-            }
-            else{
-                this.highlightCur();
-            }
-            //this.drawTileState(this.prevX, this.prevY);
-            
+            switch(this.curButton){
+                case leftMouse:
+                    this.anticipateReveal(this.curX, this.curY);
+                    break;
+                case middleMouse:
+                    this.anticipateChord();
+                    break;
+                case none:
+                    this.highlightCur();
+
+            }            
         }
     }
 
-    mouseUp(e){
-        this.drawTileState(this.curX, this.curY);
-        this.highlightCur();
-        if(!this.real) return;
-        //somehow check that it was a left click up...?
+    mouseUp(){
+        //this.drawTileState(this.curX, this.curY);
+        //this.highlightCur();
 
-        //console.log('up on', this.curX, this.curY);
-        //call click on x,y
-        this.submitClick(this.curX, this.curY);
+        
+
+        switch(this.curButton){
+            case leftMouse:
+                this.submitClick(this.curX, this.curY);
+                break;
+            case rightMouse:
+                break;
+            case middleMouse:
+                this.submitChord(this.curX, this.curY);
+                break;
+            default:
+        }
         this.drawAll();
         this.highlightCur();
     }
     mouseDown(e){
-        this.anticipateRevealCur();
+        // save the button pressed
+        this.recordButtonsPressed(e.buttons);
+
+
+        switch(this.curButton){
+            case leftMouse:
+                this.anticipateReveal(this.curX, this.curY);
+                break;
+            case rightMouse:
+                if(!this.real) return;
+                this.submitFlag(this.curX, this.curY);
+                break;
+            case middleMouse:
+                this.anticipateChord();
+                break;
+            default:
+        }
+    }
+    recordButtonsPressed(buttons){
+        if      (buttons & leftMouse)   this.curButton = leftMouse;
+        else if (buttons & rightMouse)  this.curButton = rightMouse;
+        else if (buttons & middleMouse) this.curButton = middleMouse;
+        else                            this.curButton = none;
     }
 }
