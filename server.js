@@ -10,26 +10,22 @@ const { ExpressPeerServer } = require("peer");
 const app = express();
 app.use(cors());
 
-
 if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
+    require('dotenv').config();
 }
-const port = process.env.VUE_APP_PORT || 8082;
+const port = process.env.VUE_APP_PORT || 8081;
 
-
+/*
 // make all the files in 'public' available
 // https://expressjs.com/en/starter/static-files.html
-app.use(express.static("public")); // serve build?
+app.use(express.static("public")); // uncommenting this can cause break
+*/
 
-// https://expressjs.com/en/starter/basic-routing.html
-/*app.get("/", (request, response) => {
-  response.sendFile(__dirname + "/views/index.html");
-});*/
-
-// listen for requests :)
+// listen for requests
 const listener = app.listen(port, () => {
   console.log("Your app is listening on port " + listener.address().port);
 });
+
 
 // peerjs server
 const peerServer = ExpressPeerServer(listener, {

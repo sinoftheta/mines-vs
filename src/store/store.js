@@ -2,6 +2,11 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 
 const difficulty =  {
+    bullet:{
+        height: 8,
+        width: 8,
+        mines: 8,
+    },
     beginner: {
         height: 10,
         width:  10,
@@ -30,7 +35,7 @@ const store = new Vuex.Store({
         userId: 0,
         peerId: 1,
         seed: 69,
-        board: difficulty.expert,
+        board: difficulty.intermediate,
         mode: 'beginner' // beginner | intermediate | expert | custom 
     }),
     actions: {

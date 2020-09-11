@@ -1,17 +1,19 @@
 // multiplayer minesweeper board state
 import seedrandom from 'seedrandom';
+import Tile from '@/logic/tile.js';
 
-class Tile{
-    constructor(){
-        this.value = 0;
-        this.revealed = false;
-        this.isMine = false;
-        this.flagged = false;
-        this.owner = null;
-        this.timestamp = 0;
-        this.checked = false;
-    }
-}
+
+
+console.hex = (d) => console.log((Object(d).buffer instanceof ArrayBuffer ? new Uint8Array(d.buffer) : 
+typeof d === 'string' ? (new TextEncoder('utf-8')).encode(d) : 
+new Uint8ClampedArray(d)).reduce((p, c, i, a) => p + (i % 16 === 0 ? i.toString(16).padStart(6, 0) + '  ' : ' ') + 
+c.toString(16).padStart(2, 0) + (i === a.length - 1 || i % 16 === 15 ? 
+' '.repeat((15 - i % 16) * 3) + Array.from(a).splice(i - i % 16, 16).reduce((r, v) => 
+r + (v > 31 && v < 127 || v > 159 ? String.fromCharCode(v) : '.'), '  ') + '\n' : ''), ''));
+
+
+
+
 
 export default class State{
     constructor(height, width, mines, seed, real){
@@ -40,8 +42,8 @@ export default class State{
         const target = this.board[i][j];
         let points = 0;
 
-        //check if tile is revealed
-        if(target.revealed) return 0;
+        //check if tile is revealed or flagged
+        if(target.revealed || target.flagged) return 0;
 
         //reveal tile
         target.revealed = true;
@@ -104,7 +106,18 @@ export default class State{
                 this.neighbors(i,j).forEach( ({x,y}) => {
                     if(this.board[x][y].isMine) this.board[i][j].value++
                 });
+                //TODO: turn these into tests
+
                 //if(this.neighbors(i,j).length < 3) console.log(i,j)
+
+                /*                
+                console.hex(this.board[i][j].byteRepresentation());
+                console.log(this.board[i][j]);
+                this.board[i][j].loadFromByte(this.board[i][j].byteRepresentation());
+                console.hex(this.board[i][j].byteRepresentation());
+                console.hex(this.board[i][j]);
+                console.log('=======================');
+                */
             }
         }
     }

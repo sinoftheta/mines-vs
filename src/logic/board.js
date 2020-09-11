@@ -1,5 +1,6 @@
 // renders minesweeper state on canvas
 // handles baseline canvas click functionality
+import {p1, p2} from '@/logic/const.js';
 
 const theme = {
     border: '#808080',
@@ -46,6 +47,7 @@ const x_off = (1 - scale * r3o2) * 0.5;
 function xor(a,b) {
     return ( a ? 1 : 0 ) ^ ( b ? 1 : 0 );
 }
+// could also do a != b;
 
 export default class Board{
     constructor(canvasRef, gameState, px, real, versus, submitClick, submitFlag, submitChord){
@@ -58,8 +60,8 @@ export default class Board{
         this.canvas.height = px * this.state.height;
         this.canvas.width  = px * this.state.width;
         this.submitClick  = (x,y) => { submitClick(x,y); };
+        this.submitChord  = (x,y) => { submitChord(x,y); };
         this.submitFlag   = (x,y) => { submitFlag(x,y);  };
-        this.submitChord  = (x,y) => { console.log('submitting chord');/*submitChord(x,y)*/};
         this.canvas.onmousemove = (e) => { this.mouseMove(e) };
         this.canvas.onmousedown = (e) => { this.mouseDown(e) };
         this.canvas.onmouseup   = (e) => { this.mouseUp(e)   };
@@ -118,10 +120,10 @@ export default class Board{
         const light = xor( x % 2 == 0, y % 2 == 0);
 
         // draw revealed cell
-        if(this.versus && this.state.board[x][y].owner){
+        if(this.versus && this.state.board[x][y].owner == p1){
             this.ctx.fillStyle = light ? theme.p1Background1 : theme.p1Background2;
         }
-        else if(this.versus && !this.state.board[x][y].owner){
+        else if(this.versus && this.state.board[x][y].owner == p2){
             this.ctx.fillStyle = light ? theme.p2Background1 : theme.p2Background2;
         }
         else{
@@ -132,10 +134,13 @@ export default class Board{
         this.ctx.stroke();
     }
     drawFlag(x,y){
+        const target = this.state.board[x][y];
         const ctx = this.ctx;
         const px = this.px;
-        ctx.fillStyle   = theme.p2FlagFill;
-        ctx.strokeStyle = theme.p2FlagStroke;
+
+        // use p1 flag colors for singleplayer
+        ctx.fillStyle   = this.versus && target.owner == p2 ? theme.p2FlagFill   : theme.p1FlagFill;
+        ctx.strokeStyle = this.versus && target.owner == p2 ? theme.p2FlagStroke : theme.p1FlagStroke;
         ctx.lineWidth = 2;
         ctx.beginPath();
 
@@ -143,6 +148,7 @@ export default class Board{
         ctx.lineTo( (x + x_off) * px ,     ( (y + 1 - (1 - scale) * 0.5)) * px ); // bottom left triangle point
         ctx.lineTo( (x + 1 - x_off) * px , ( y + 0.5) * px ); // right triangle point
         ctx.lineTo( (x + x_off) * px ,     ( y + (1 - scale) * 0.5) * px ); // back to origin
+        ctx.lineTo( (x + x_off) * px ,     ( y + 0.5) * px ); // go halfway down to properly get corner of stroke 
 
         ctx.fill();
         ctx.stroke();
@@ -208,6 +214,7 @@ export default class Board{
         */
     }
     highlightCur(){
+        if(this.oob(this.curX,this.curY)) return;
         const target = this.state.board[this.curX][this.curY];
         const ctx = this.ctx, px = this.px;
         if(!target.revealed || !(target.value == 0 || target.isMine)){
@@ -249,7 +256,9 @@ export default class Board{
         }
     }
 
-    // mouse behavior ...move to a different obj?
+    // above is drawing instructions
+    // below is mouse state handling
+    // they should be split up!
     mouseMove(e){
 
         this.recordButtonsPressed(e.buttons);

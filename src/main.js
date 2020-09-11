@@ -21,5 +21,3 @@ new Vue({
     this.$store.dispatch('init');
   }
 }).$mount('#app');
-
-

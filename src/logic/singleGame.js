@@ -45,7 +45,7 @@ export default class SingleGame{
 
         // recursive reveal, get points awarded for reveal
         const points = this.boardState.revealPoints(x,y);
-        console.log(`scored: ${points}, total: ${this.points += points}`);
+        //console.log(`scored: ${points}, total: ${this.points += points}`);
         if( points < 0){
             // game lost!
             // stop timer
@@ -64,7 +64,27 @@ export default class SingleGame{
             target.flagged = !target.flagged;
         }
     }
-    choord(x,y){
+    chord(i,j){
+        const choordTarg = this.boardState.board[i][j];
+        if(!choordTarg.revealed || choordTarg.isMine) return;
+        let revealList = [];
+        let neighborFlagCount = 0;
 
+        // count neighboring flags and save potential tile coordinates to reveal 
+        this.boardState.neighbors(i,j).forEach( ({x,y}) => {
+            const target = this.boardState.board[x][y];
+            if(target.flagged && !target.revealed){
+                ++neighborFlagCount;
+            }else if(!target.flagged && !target.revealed){
+                revealList.push({x,y});
+            }
+        });
+
+        // reveal tiles if the value matches number of surounding flags
+        if(neighborFlagCount === choordTarg.value){
+            revealList.forEach( ({x,y}) => {
+                this.leftClick(x,y);
+            });
+        }
     }
 }
