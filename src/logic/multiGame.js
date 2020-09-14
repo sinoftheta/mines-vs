@@ -1,5 +1,5 @@
 import State from '@/logic/state';
-import Board from '@/logic/board';
+import BoardRender from '@/logic/boardRender';
 import Peer from 'peerjs';
 import {p1, p2} from '@/logic/const.js';
 
@@ -52,7 +52,7 @@ export default class MultiGame{
         this.boardRef = boardRef;
         this.px = px;
         this.boardState = new State(height, width, mines, 69, false);
-        this.board = new Board(boardRef, this.boardState, px, false, false, () => {});
+        this.board = new BoardRender(boardRef, this.boardState, px, false, false, () => {});
 
         //this.onIdGenerate = onIdGenerate;
         this.startCountDownUI = startCountDownUI;
@@ -188,7 +188,7 @@ export default class MultiGame{
     setBoardSync(){
         //resets the board with a syncronised state
         this.boardState = new State(this.height, this.width, this.mines, this.seed, true);
-        this.board = new Board(
+        this.board = new BoardRender(
             this.boardRef, 
             this.boardState, 
             this.px, 

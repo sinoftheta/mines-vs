@@ -1,5 +1,6 @@
 import State from '@/logic/state';
-import Board from '@/logic/board';
+import BoardRender from '@/logic/boardRender';
+import MouseHandler from './mouseHandler';
 
 export default class SingleGame{
     constructor(
@@ -16,12 +17,23 @@ export default class SingleGame{
         this.boardRef = boardRef;
         this.px = px;
         this.boardState = new State(height, width, mines, 1, true);
-        this.board = new Board(
+        this.board = new BoardRender(
             boardRef, 
             this.boardState, 
             px, 
             true, 
             false, 
+            /*
+            (x,y) => {this.leftClick(x,y);},
+            (x,y) => {     this.flag(x,y);},
+            (x,y) => {    this.chord(x,y);}
+            */
+        );
+        this.mouseHandler = new MouseHandler(
+            boardRef, 
+            this.boardState, 
+            this.board,
+            true, // real flag
             (x,y) => {this.leftClick(x,y);},
             (x,y) => {     this.flag(x,y);},
             (x,y) => {    this.chord(x,y);}

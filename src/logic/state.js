@@ -74,9 +74,20 @@ export default class State{
         return points;
     }
     reclaimTiles(newOwner, x, y){
-        // TODO: keep a hash table of 
+        // reclaim target and its associated points, and all tiles with the same origin if it is a zero
+        const origin = this.board[x][y];
+        let points = 0;
         for(let i = 0; i < width; ++i){
             for(let j = 0; j < height; ++j){
+                const target = this.board[i][j];
+
+                if( 
+                    target.revealed && // dont reclaim tiles covered due to flags
+                    target.islandId == origin.islandId
+                    ){
+                        target.owner = newOwner;
+                        //target.reclaimed = true;
+                }
 
 
             }

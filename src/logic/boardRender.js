@@ -49,7 +49,7 @@ function xor(a,b) {
 }
 // could also do a != b;
 
-export default class Board{
+export default class BoardRender{
     constructor(canvasRef, gameState, px, real, versus, submitClick, submitFlag, submitChord){
         this.real = real;
         this.versus = versus;
@@ -59,6 +59,9 @@ export default class Board{
         this.ctx = this.canvas.getContext('2d');
         this.canvas.height = px * this.state.height;
         this.canvas.width  = px * this.state.width;
+
+
+        /** from here */
         this.submitClick  = (x,y) => { submitClick(x,y); };
         this.submitChord  = (x,y) => { submitChord(x,y); };
         this.submitFlag   = (x,y) => { submitFlag(x,y);  };
@@ -71,6 +74,9 @@ export default class Board{
         this.prevY = -1;
         this.curY  = -1;
         this.curX  = -1;
+        /** to here,
+         * belongs in a mouseHandler class
+         */
 
         this.drawAll();
     }
@@ -213,15 +219,15 @@ export default class Board{
         ctx.lineWidth = 1;
         */
     }
-    highlightCur(){
-        if(this.oob(this.curX,this.curY)) return;
-        const target = this.state.board[this.curX][this.curY];
+    highlight(x,y){
+        if(this.oob(x,y)) return;
+        const target = this.state.board[x][y];
         const ctx = this.ctx, px = this.px;
         if(!target.revealed || !(target.value == 0 || target.isMine)){
             ctx.beginPath();
             ctx.fillStyle = theme.hover;
             ctx.strokeStyle = ctx.fillStyle;
-            ctx.rect(this.curX * px, this.curY * px, px, px);
+            ctx.rect(x * px, y * px, px, px);
             ctx.fill();
             ctx.stroke();
         }
@@ -246,94 +252,13 @@ export default class Board{
             if(target.flagged) this.drawFlag(x,y);
         }
     }
-    anticipateChord(){
-        if(this.oob(this.curX, this.curY)) return;
-        this.anticipateReveal(this.curX, this.curY);
-        for( let {x,y} of this.state.neighbors(this.curX, this.curY)){
+    anticipateChord(x,y){
+        if(this.oob(x, y)) return;
+        this.anticipateReveal(x, y);
+        for( let {x,y} of this.state.neighbors(x, y)){
             if(!this.state.board[x][y].revealed){
                 this.anticipateReveal(x,y);
             }
         }
-    }
-
-    // above is drawing instructions
-    // below is mouse state handling
-    // they should be split up!
-    mouseMove(e){
-
-        this.recordButtonsPressed(e.buttons);
-        const rect = this.canvas.getBoundingClientRect();
-        const x = Math.floor(Math.floor(e.clientX - rect.left) / this.px);
-        const y = Math.floor(Math.floor(e.clientY - rect.top)  / this.px);
-        
-        if(this.curX != x || this.curY != y){
-            //update current tile coordinates
-            this.prevX = this.curX;
-            this.prevY = this.curY;
-            this.curY = y;
-            this.curX = x;
-
-            this.drawAll();
-
-            console.log(this.state.board[x][y]);
-
-            switch(this.curButton){
-                case leftMouse:
-                    this.anticipateReveal(this.curX, this.curY);
-                    break;
-                case middleMouse:
-                    this.anticipateChord();
-                    break;
-                case none:
-                    this.highlightCur();
-
-            }            
-        }
-    }
-
-    mouseUp(){
-        //this.drawTileState(this.curX, this.curY);
-        //this.highlightCur();
-
-        
-
-        switch(this.curButton){
-            case leftMouse:
-                this.submitClick(this.curX, this.curY);
-                break;
-            case rightMouse:
-                break;
-            case middleMouse:
-                this.submitChord(this.curX, this.curY);
-                break;
-            default:
-        }
-        this.drawAll();
-        this.highlightCur();
-    }
-    mouseDown(e){
-        // save the button pressed
-        this.recordButtonsPressed(e.buttons);
-
-
-        switch(this.curButton){
-            case leftMouse:
-                this.anticipateReveal(this.curX, this.curY);
-                break;
-            case rightMouse:
-                if(!this.real) return;
-                this.submitFlag(this.curX, this.curY);
-                break;
-            case middleMouse:
-                this.anticipateChord();
-                break;
-            default:
-        }
-    }
-    recordButtonsPressed(buttons){
-        if      (buttons & leftMouse)   this.curButton = leftMouse;
-        else if (buttons & rightMouse)  this.curButton = rightMouse;
-        else if (buttons & middleMouse) this.curButton = middleMouse;
-        else                            this.curButton = none;
     }
 }
