@@ -236,7 +236,7 @@ export default class Board{
             ctx.beginPath();
 
             if(target.flagged) ctx.fillStyle = light ? theme.revealFlagCover1 : theme.revealFlagCover2;
-            else               ctx.fillStyle = light ? theme.background1 : theme.background2;
+            else               ctx.fillStyle = light ? theme.background1      : theme.background2;
 
             ctx.strokeStyle = ctx.fillStyle;
             ctx.rect(x * px, y * px, px, px);
@@ -274,6 +274,8 @@ export default class Board{
             this.curX = x;
 
             this.drawAll();
+
+            console.log(this.state.board[x][y]);
 
             switch(this.curButton){
                 case leftMouse:

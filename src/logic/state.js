@@ -1,17 +1,16 @@
 // multiplayer minesweeper board state
 import seedrandom from 'seedrandom';
 import Tile from '@/logic/tile.js';
+import {p1,p2} from '@/logic/const.js';
 
 
-
+// for debugging https://nielsleenheer.com/articles/2017/the-case-for-console-hex/
 console.hex = (d) => console.log((Object(d).buffer instanceof ArrayBuffer ? new Uint8Array(d.buffer) : 
 typeof d === 'string' ? (new TextEncoder('utf-8')).encode(d) : 
 new Uint8ClampedArray(d)).reduce((p, c, i, a) => p + (i % 16 === 0 ? i.toString(16).padStart(6, 0) + '  ' : ' ') + 
 c.toString(16).padStart(2, 0) + (i === a.length - 1 || i % 16 === 15 ? 
 ' '.repeat((15 - i % 16) * 3) + Array.from(a).splice(i - i % 16, 16).reduce((r, v) => 
 r + (v > 31 && v < 127 || v > 159 ? String.fromCharCode(v) : '.'), '  ') + '\n' : ''), ''));
-
-
 
 
 
@@ -36,9 +35,10 @@ export default class State{
         if(real){
             this.placeMines();
             this.placeNumbers();
+            this.placeIslandIds();
         }
     }
-    revealPoints(i,j,owner){
+    revealPoints(i,j,owner, originX, originY){
         const target = this.board[i][j];
         let points = 0;
 
@@ -48,6 +48,7 @@ export default class State{
         //reveal tile
         target.revealed = true;
         target.owner = owner;
+        target.origin = {x: originX, y: originY};
         points += target.value;
 
         //return early & penalize if mine
@@ -67,20 +68,26 @@ export default class State{
         //if tile is a zero, recurse over all neighbors
         if(target.value === 0){
             this.neighbors(i,j).forEach( ({x,y}) => {
-                points += this.revealPoints(x,y, owner);
+                points += this.revealPoints(x,y, owner, originX, originY);
             });
         }
         return points;
     }
-    reclaimTiles(tiles){
+    reclaimTiles(newOwner, x, y){
+        // TODO: keep a hash table of 
+        for(let i = 0; i < width; ++i){
+            for(let j = 0; j < height; ++j){
 
+
+            }
+        }
     }
     placeMines(){
         let n = this.mines, x, y, target;
 
         while(n > 0){
             y = Math.floor(this.rng() * this.height );
-            x = Math.floor(this.rng() * this.width );
+            x = Math.floor(this.rng() * this.width  );
 
             target = this.board[x][y];
 
@@ -103,6 +110,10 @@ export default class State{
     placeNumbers(){
         for(let i = 0; i < this.width; ++i){
             for(let j = 0; j < this.height; ++j){
+                // assign random ppp. there are better ways to do this will do for now
+                // can also be done in constructor, really doesnt matter
+                this.board[i][j].ppp = this.rng() > 0.5 ? p1 : p2;
+
                 this.neighbors(i,j).forEach( ({x,y}) => {
                     if(this.board[x][y].isMine) this.board[i][j].value++
                 });
@@ -118,6 +129,43 @@ export default class State{
                 console.hex(this.board[i][j]);
                 console.log('=======================');
                 */
+            }
+        }
+    }
+    placeIslandIds(){
+        let id = 0;
+        for(let i = 0; i < this.width; ++i){
+            for(let j = 0; j < this.height; ++j){
+                const target = this.board[i][j];
+                if(target.value == 0 && target.checked == false){
+                    this.markIslandRecursive(i, j, id);
+                } 
+                else if(target.value != 0){
+                    target.islandId = id;
+                    target.checked = true;
+                }
+                id++;
+            }
+        }
+    }
+    markIslandRecursive(i, j, id){
+        const target = this.board[i][j];
+        if (target.checked) return;
+        target.checked = true;
+        target.islandId = id;
+
+        this.neighbors(i,j).forEach( ({x,y}) => {
+            if(this.board[x][y].value == 0 && this.board[x][y].checked == false){
+                this.markIslandRecursive(x, y, id);
+            }
+        });
+
+
+    }
+    uncheckAll(){
+        for(let i = 0; i < width; ++i){
+            for(let j = 0; j < height; ++j){
+                this.board[i][j]. checked = false;
             }
         }
     }

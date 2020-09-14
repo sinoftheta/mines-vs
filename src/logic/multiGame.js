@@ -13,7 +13,8 @@ import {p1, p2} from '@/logic/const.js';
  * 
  * opponent = client = p2
  * 
- * 
+ * all operations are communitive, meaning the order in which they are applied to the board does not matter
+ * both player states will resolve to the same final state as long as all inputs are received by both players.
  */
 
 // transmission types:
@@ -204,15 +205,15 @@ export default class MultiGame{
         this.gameActive = true;
     }
     userLeftClick(x,y){
-        //if(!this.gameActive) return;
-        const gameTime = Date.now() - this.gameStartTime;
+        if(!this.gameActive || this.boardState.board[x][y].revealed) return; //?
+        //const gameTime = Date.now() - this.gameStartTime;
         //console.log('SENDING TS:', gameTime);
-        const points = this.boardState.revealPoints(x,y, this.player);
+        const points = this.boardState.revealPoints(x,y, this.player, x,y);
         this.conn.send({
             type: leftClick,
             x,
             y,
-            gameTime
+            //gameTime
         });
         console.log(`you scored: ${points}, your total: ${this.userPoints += points}`);
 
@@ -222,28 +223,29 @@ export default class MultiGame{
             return;
         }
     }
-    opponentLeftClick(x,y, gameTime){
-        // check for overlap. i.e. if need to rollback
-        // send overlap command if needed
-
+    opponentLeftClick(x,y){
 
         // create a dictionary with x,y as the key, and the timestamp & owner & point value of click as the value
         /*let hub = {
             _1_2: {ts: 123, owner: 'host', points: 12}
         }*/
-        // with an earlier timestamp, we reclaim all the tiles and the points that were earned with that click
-        // if the opponent click has a later timestamp, ignore it. your click will be sent to the opponent and they will sync
-        // store list of all moves in list, search list from end to be efficent?
-        //update board
 
         // before the game starts, each tile will be randomly assigned a "player point priority." 
         // This value will determine the ownership of a click in the event of a tie.
         // if we receive an opponent click that has already been executed on the board, we look to the "player point priority" value
         // of the tile
 
-        const now = Date.now();
-        console.log(`opponent click at: ${gameTime}, current gameTime: ${now - this.gameStartTime}, diff: ${now - this.gameStartTime - gameTime}`)
-        const points = this.boardState.revealPoints(x,y, this.opponent);
+
+        const target = this.boardState.board[x][y];
+        // if tile is revealed, look to the player point priority of the tile to determine if the opponent gets the tile, or if the click is ignored by the client
+        if(target.revealed && target.ppp == this.opponent){
+            console.log('opponent click overriding at:',x,y)
+            this.revokeClick(x,y);
+        }
+        else if(!target.revealed){
+            console.log('opponent click at:',x,y);
+            const points = this.boardState.revealPoints(x,y, this.opponent);
+        }
         this.board.drawAll();
         this.board.highlightCur();
 
@@ -256,6 +258,8 @@ export default class MultiGame{
 
     userFlag(x,y){
         console.log('user flagging')
+        if(!this.gameActive) return;
+
         const target = this.boardState.board[x][y];
 
         if(target.revealed) return;
@@ -290,6 +294,7 @@ export default class MultiGame{
     revokeClick(){
         // change ownership of click due to a tie
         // this includes points earned from the click, and all other tiles revealed from the click in the event of a 0.
+        console.log('revoking click');
     }
     revokeChord(){
         // revokes the ownership of a chord input...

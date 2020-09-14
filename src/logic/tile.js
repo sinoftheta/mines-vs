@@ -10,14 +10,20 @@ const p1bit    = 0b00000000;
 
 export default class Tile{
     constructor(){
-        this.value = 0;
+        this.value    = 0;
         this.revealed = false;
-        this.isMine = false;
-        this.flagged = false;
-        this.owner = p1;
-        this.timestamp = 0;
-        this.checked = false;
+        this.isMine   = false;
+        this.flagged  = false;
+
+        //multiplayer data
+        this.checked  = false;
+        this.origin   = {x: null, y: null};
+        this.islandId = 0;
+        this.owner    = null; // which player owns the tile
+        this.ppp      = null;   // player point priority 
+
     }
+    // these work but need to be redone
     byteRepresentation(){
         return String.fromCharCode(
             (this.value & value)           |

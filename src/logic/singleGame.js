@@ -44,7 +44,7 @@ export default class SingleGame{
         }
 
         // recursive reveal, get points awarded for reveal
-        const points = this.boardState.revealPoints(x,y);
+        const points = this.boardState.revealPoints(x, y, null, x, y);
         //console.log(`scored: ${points}, total: ${this.points += points}`);
         if( points < 0){
             // game lost!
