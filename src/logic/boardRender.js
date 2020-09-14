@@ -60,25 +60,14 @@ export default class BoardRender{
         this.canvas.height = px * this.state.height;
         this.canvas.width  = px * this.state.width;
 
+        // this text setting really only works with 30px tiles, need to make it scalable or at least have 3 or 4 predetermined styles
+        this.ctx.lineWidth = 1;
+        this.ctx.font = `${px * .6}px Impact`;
+        this.ctx.textAlign = 'center';
+        
+        //this.drawAll();
 
-        /** from here */
-        this.submitClick  = (x,y) => { submitClick(x,y); };
-        this.submitChord  = (x,y) => { submitChord(x,y); };
-        this.submitFlag   = (x,y) => { submitFlag(x,y);  };
-        this.canvas.onmousemove = (e) => { this.mouseMove(e) };
-        this.canvas.onmousedown = (e) => { this.mouseDown(e) };
-        this.canvas.onmouseup   = (e) => { this.mouseUp(e)   };
-        this.canvas.oncontextmenu = function(e) { e.preventDefault(); e.stopPropagation(); };
-
-        this.prevX = -1;
-        this.prevY = -1;
-        this.curY  = -1;
-        this.curX  = -1;
-        /** to here,
-         * belongs in a mouseHandler class
-         */
-
-        this.drawAll();
+        this.drawPpp(p2);
     }
     oob(x,y){ 
         return x >= this.state.width || x < 0 || y >= this.state.height || y < 0;  
@@ -87,10 +76,6 @@ export default class BoardRender{
         const ctx = this.ctx;
         const state = this.state;
         const px = this.px;
-
-        ctx.lineWidth = 1;
-        ctx.font = `${px * .6}px Impact`;
-        ctx.textAlign = 'center';
 
         for(let i = 0; i < state.width; ++i){
             for(let j = 0; j < state.height; ++j){
@@ -258,6 +243,37 @@ export default class BoardRender{
         for( let {x,y} of this.state.neighbors(x, y)){
             if(!this.state.board[x][y].revealed){
                 this.anticipateReveal(x,y);
+            }
+        }
+    }
+    // debug drawings
+    drawPpp(player){
+        const ctx = this.ctx;
+        const state = this.state;
+        const px = this.px;
+        
+
+
+        for(let i = 0; i < state.width; ++i){
+            for(let j = 0; j < state.height; ++j){
+                const light = xor( i % 2 == 0, j % 2 == 0);
+                const target = this.state.board[i][j];
+                if(target.ppp == player){
+                    this.ctx.fillStyle = light ? theme.p1Background1 : theme.p1Background2;
+                }
+                else{
+                    this.ctx.fillStyle = light ? theme.p2Background1 : theme.p2Background2;
+                }
+                ctx.strokeStyle = ctx.fillStyle;
+                ctx.beginPath();
+                ctx.rect(i * this.px, j * this.px, this.px, this.px);
+                ctx.fill();
+                ctx.stroke();
+
+                
+                this.drawValue(i,j,target.value < 9 ? target.value : 0);
+                if(target.isMine) this.drawMine(i,j);
+                
             }
         }
     }

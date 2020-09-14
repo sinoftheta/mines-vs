@@ -20,7 +20,9 @@ export default class MouseHandler{
         this.canvas.onmousemove = (e) => { this.mouseMove(e) };
         this.canvas.onmousedown = (e) => { this.mouseDown(e) };
         this.canvas.onmouseup   = (e) => { this.mouseUp(e)   };
+        window.onkeydown = (e) => { this.onKeyPress(e.key); };
         this.canvas.oncontextmenu = function(e) { e.preventDefault(); e.stopPropagation(); };
+        
 
         this.curButton = none;
         this.prevX = -1;
@@ -102,6 +104,13 @@ export default class MouseHandler{
         switch(key){
             default:
                 return;
+            // debug tools
+            case 'r':
+                this.state.reclaimTiles('mr poob', this.curX, this.curY);
+                break;
+            case 'd':
+                console.log(this.curX + ',' + this.curY + ':', this.state.board[this.curX][this.curY]);
+                break;
         }
     }
 }

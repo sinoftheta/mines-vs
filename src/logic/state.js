@@ -36,6 +36,7 @@ export default class State{
             this.placeMines();
             this.placeNumbers();
             this.placeIslandIds();
+            this.placePpp();
         }
     }
     revealPoints(i,j,owner, originX, originY){
@@ -74,24 +75,22 @@ export default class State{
         return points;
     }
     reclaimTiles(newOwner, x, y){
-        // reclaim target and its associated points, and all tiles with the same origin if it is a zero
-        const origin = this.board[x][y];
-        let points = 0;
-        for(let i = 0; i < width; ++i){
-            for(let j = 0; j < height; ++j){
-                const target = this.board[i][j];
-
-                if( 
-                    target.revealed && // dont reclaim tiles covered due to flags
-                    target.islandId == origin.islandId
-                    ){
-                        target.owner = newOwner;
-                        //target.reclaimed = true;
-                }
 
 
-            }
-        }
+        // case 1: tile at x,y is nonzero valued tile or mine
+            // just reclaim it, i.e. set new owner
+        
+        // case 2: a zero tile...
+            // you're finding the click that you made with the same island id as the incoming zero click,
+            // and actually uncoveered tiles. lets call it UsrClick0
+            // then you're reclaiming all the tiles whos origin is UsrClick0
+        
+            // 1. get island id associated with {x,y}
+            // 2. get origin click associated with any tile with that island id
+            // 3. reclaim all tiles (and their points) with the same origin click
+
+        
+        
     }
     placeMines(){
         let n = this.mines, x, y, target;
@@ -143,6 +142,49 @@ export default class State{
             }
         }
     }
+    placePpp(){
+        const rand = this.rng() > 0.5 ? 0 : 1;
+        for(let i = 0; i < this.width; ++i){
+            for(let j = 0; j < this.height; ++j){
+                // assign random ppp. there are better ways to do this will do for now
+                // can also be done in constructor, really doesnt matter
+                // all members with the same islandId must have the same ppp
+                if(this.board[i][j].value == 0){
+                    this.board[i][j].ppp = (rand + this.board[i][j].islandId) % 2 == 0 ? p1 : p2;
+                }
+                else{
+                    this.board[i][j].ppp = this.rng() > 0.5 ? p1 : p2;
+                }
+                
+            }
+        }
+    }
+    neighbors(x,y) {
+        const h = this.height, w = this.width;
+        const neighbors = [
+            {x:x+1, y},
+            {x, y:y+1},
+            {x:x-1, y},
+            {x, y:y-1},
+            {x:x+1, y:y+1},
+            {x:x+1, y:y-1},
+            {x:x-1, y:y+1},
+            {x:x-1, y:y-1}
+        ]
+        return neighbors.filter( n => !(
+            n.x == w  ||
+            n.x < 0   ||
+            n.y == h  ||
+            n.y < 0  
+        ));
+    }
+    get clear(){
+        // area - uncovered = mines
+        return (this.height * this.width) - this.uncoveredSafeTiles === this.mines;
+    }
+
+    // unused? 
+
     placeIslandIds(){
         let id = 0;
         for(let i = 0; i < this.width; ++i){
@@ -179,29 +221,6 @@ export default class State{
                 this.board[i][j]. checked = false;
             }
         }
-    }
-    neighbors(x,y) {
-        const h = this.height, w = this.width;
-        const neighbors = [
-            {x:x+1, y},
-            {x, y:y+1},
-            {x:x-1, y},
-            {x, y:y-1},
-            {x:x+1, y:y+1},
-            {x:x+1, y:y-1},
-            {x:x-1, y:y+1},
-            {x:x-1, y:y-1}
-        ]
-        return neighbors.filter( n => !(
-            n.x == w  ||
-            n.x < 0   ||
-            n.y == h  ||
-            n.y < 0  
-        ));
-    }
-    get clear(){
-        // area - uncovered = mines
-        return (this.height * this.width) - this.uncoveredSafeTiles === this.mines;
     }
 
 

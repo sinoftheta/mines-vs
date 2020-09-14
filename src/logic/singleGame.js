@@ -2,6 +2,8 @@ import State from '@/logic/state';
 import BoardRender from '@/logic/boardRender';
 import MouseHandler from './mouseHandler';
 
+import {p1,p2} from '@/logic/const.js'; // for debugging purposes - multiplayer features are tested in singleplayer first
+
 export default class SingleGame{
     constructor(
         boardRef, 
@@ -21,22 +23,17 @@ export default class SingleGame{
             boardRef, 
             this.boardState, 
             px, 
-            true, 
-            false, 
-            /*
-            (x,y) => {this.leftClick(x,y);},
-            (x,y) => {     this.flag(x,y);},
-            (x,y) => {    this.chord(x,y);}
-            */
+            true, // real flag
+            false // versus flag
         );
         this.mouseHandler = new MouseHandler(
             boardRef, 
             this.boardState, 
             this.board,
             true, // real flag
-            (x,y) => {this.leftClick(x,y);},
-            (x,y) => {     this.flag(x,y);},
-            (x,y) => {    this.chord(x,y);}
+            (x,y) => { this.leftClick(x,y);},
+            (x,y) => {      this.flag(x,y);},
+            (x,y) => {     this.chord(x,y);}
         );
         this.firstClick = true;
         this.points = 0;
@@ -56,7 +53,7 @@ export default class SingleGame{
         }
 
         // recursive reveal, get points awarded for reveal
-        const points = this.boardState.revealPoints(x, y, null, x, y);
+        const points = this.boardState.revealPoints(x, y, p1, x, y);
         //console.log(`scored: ${points}, total: ${this.points += points}`);
         if( points < 0){
             // game lost!
