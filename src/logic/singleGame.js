@@ -24,7 +24,7 @@ export default class SingleGame{
             this.boardState, 
             px, 
             true, // real flag
-            false // versus flag
+            true // versus flag, true for testing purposes
         );
         this.mouseHandler = new MouseHandler(
             boardRef, 

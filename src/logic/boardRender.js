@@ -65,9 +65,9 @@ export default class BoardRender{
         this.ctx.font = `${px * .6}px Impact`;
         this.ctx.textAlign = 'center';
         
-        //this.drawAll();
+        this.drawAll();
 
-        this.drawPpp(p2);
+        //this.drawPpp(p2);
     }
     oob(x,y){ 
         return x >= this.state.width || x < 0 || y >= this.state.height || y < 0;  

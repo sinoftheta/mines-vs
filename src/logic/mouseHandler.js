@@ -1,4 +1,5 @@
 
+import {p1,p2} from '@/logic/const.js';
 
 // mouse button constants
 const none = 0;
@@ -105,10 +106,12 @@ export default class MouseHandler{
             default:
                 return;
             // debug tools
-            case 'r':
-                this.state.reclaimTiles('mr poob', this.curX, this.curY);
+            case 'r': // force send click to opponent
+                this.state.reclaimTiles(p2, this.curX, this.curY);
+                this.render.drawAll();
+                this.render.highlight(this.curX, this.curY);
                 break;
-            case 'd':
+            case 'd': // log tile state
                 console.log(this.curX + ',' + this.curY + ':', this.state.board[this.curX][this.curY]);
                 break;
         }
