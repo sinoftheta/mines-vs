@@ -8,16 +8,16 @@ const rightMouse = 2;
 const middleMouse = 4;
 
 export default class MouseHandler{
-    constructor(canvasRef, gameState, boardRender, real, submitClick, submitFlag, submitChord){
+    constructor(canvasRef, gameState, boardRender, submitClick, submitFlag, submitChord, _debugForceClick){
         this.canvas = canvasRef;
         this.state = gameState;
         this.render = boardRender;
         this.px = boardRender.px;
-        this.real = real;
 
         this.submitClick  = (x,y) => { submitClick(x,y); };
         this.submitChord  = (x,y) => { submitChord(x,y); };
         this.submitFlag   = (x,y) => { submitFlag(x,y);  };
+        this._debugForceClick = (x,y) => { _debugForceClick(x,y); };
         this.canvas.onmousemove = (e) => { this.mouseMove(e) };
         this.canvas.onmousedown = (e) => { this.mouseDown(e) };
         this.canvas.onmouseup   = (e) => { this.mouseUp(e)   };
@@ -86,7 +86,6 @@ export default class MouseHandler{
                 this.render.anticipateReveal(this.curX, this.curY);
                 break;
             case rightMouse:
-                if(!this.real) return;
                 this.submitFlag(this.curX, this.curY);
                 break;
             case middleMouse:
@@ -106,10 +105,8 @@ export default class MouseHandler{
             default:
                 return;
             // debug tools
-            case 'r': // force send click to opponent
-                this.state.reclaimTiles(p2, this.curX, this.curY);
-                this.render.drawAll();
-                this.render.highlight(this.curX, this.curY);
+            case 'f': // force send click to opponent
+                this._debugForceClick(this.curX,this.curY);
                 break;
             case 'd': // log tile state
                 console.log(this.curX + ',' + this.curY + ':', this.state.board[this.curX][this.curY]);

@@ -1,5 +1,6 @@
 import State from '@/logic/state';
 import BoardRender from '@/logic/boardRender';
+import MouseHandler from '@/logic/mouseHandler';
 import Peer from 'peerjs';
 import {p1, p2} from '@/logic/const.js';
 
@@ -51,8 +52,16 @@ export default class MultiGame{
         this.mines = mines;
         this.boardRef = boardRef;
         this.px = px;
-        this.boardState = new State(height, width, mines, 69, false);
-        this.board = new BoardRender(boardRef, this.boardState, px, false, false, () => {});
+        this.state = new State(height, width, mines, 69, false);
+        this.render = new BoardRender(boardRef, this.state, px, false, false, () => {});
+        this.mouseHandler = new MouseHandler(
+            boardRef, 
+            this.state, 
+            this.render,
+            () => {},
+            () => {},
+            () => {},
+        );
 
         //this.onIdGenerate = onIdGenerate;
         this.startCountDownUI = startCountDownUI;
@@ -174,8 +183,6 @@ export default class MultiGame{
             case ping:
                 this.handlePing();
                 break;
-
-
         }
     }
     handlePing(){
@@ -187,17 +194,25 @@ export default class MultiGame{
     }
     setBoardSync(){
         //resets the board with a syncronised state
-        this.boardState = new State(this.height, this.width, this.mines, this.seed, true);
-        this.board = new BoardRender(
+
+        console.log('playing as: ' + this.player);
+        this.state = new State(this.height, this.width, this.mines, this.seed, true);
+        this.render = new BoardRender(
             this.boardRef, 
-            this.boardState, 
+            this.state, 
             this.px, 
             true, // real flag
             true, // multiplayer flag
-            (x,y) => {this.userLeftClick(x,y);},
-            (x,y) => {this.userFlag(x,y);}
-            /* chording */
-            );
+        );
+        this.mouseHandler = new MouseHandler(
+            this.boardRef, 
+            this.state, 
+            this.render,
+            (x,y) => { this.userLeftClick(x,y); },
+            (x,y) => {      this.userFlag(x,y); },
+            (x,y) => {     this.userChord(x,y); },
+            (x,y) => { this._debugForceClick(x,y); },
+        );
     }
     startGame(){// also do more?
         console.log('go!');
@@ -205,19 +220,14 @@ export default class MultiGame{
         this.gameActive = true;
     }
     userLeftClick(x,y){
-        if(!this.gameActive || this.boardState.board[x][y].revealed) return; //?
+        if(!this.gameActive || this.state.board[x][y].revealed) return; //?
         //const gameTime = Date.now() - this.gameStartTime;
         //console.log('SENDING TS:', gameTime);
-        const points = this.boardState.revealPoints(x,y, this.player, x,y);
-        this.conn.send({
-            type: leftClick,
-            x,
-            y,
-            //gameTime
-        });
+        const points = this.state.revealPoints(x,y, this.player, x,y);
+        this.conn.send({type: leftClick,x,y,});
         console.log(`you scored: ${points}, your total: ${this.userPoints += points}`);
 
-        if(this.boardState.clear){
+        if(this.state.clear){
             // game won
             console.log('game over!');
             return;
@@ -236,20 +246,20 @@ export default class MultiGame{
         // of the tile
 
 
-        const target = this.boardState.board[x][y];
+        const target = this.state.board[x][y];
         // if tile is revealed, look to the player point priority of the tile to determine if the opponent gets the tile, or if the click is ignored by the client
         if(target.revealed && target.ppp == this.opponent){
             console.log('opponent click overriding at:',x,y)
-            this.revokeClick(x,y);
+            const points = this.state.reclaimTiles(this.opponent,x,y);
         }
         else if(!target.revealed){
             console.log('opponent click at:',x,y);
-            const points = this.boardState.revealPoints(x,y, this.opponent);
+            const points = this.state.revealPoints(x,y, this.opponent, x,y);
         }
-        this.board.drawAll();
-        this.board.highlightCur();
+        this.render.drawAll();
+        this.render.highlight(this.mouseHandler.curX, this.mouseHandler.curY);
 
-        if(this.boardState.clear){
+        if(this.state.clear){
             // game won
             console.log('game over!');
             return;
@@ -260,7 +270,7 @@ export default class MultiGame{
         console.log('user flagging')
         if(!this.gameActive) return;
 
-        const target = this.boardState.board[x][y];
+        const target = this.state.board[x][y];
 
         if(target.revealed) return;
         // if tile is empty
@@ -275,7 +285,7 @@ export default class MultiGame{
     }
     opponentFlag(x,y){
         console.log('opponent flagging')
-        const target = this.boardState.board[x][y];
+        const target = this.state.board[x][y];
 
         if(target.revealed) return;
         // tile is empty and covered
@@ -287,8 +297,8 @@ export default class MultiGame{
         target.owner = target.flagged? this.opponent : null;
         
 
-        this.board.drawAll();
-        this.board.highlightCur();
+        this.render.drawAll();
+        this.render.highlight(this.mouseHandler.curX, this.mouseHandler.curY);
 
     }
     revokeClick(){
@@ -296,9 +306,38 @@ export default class MultiGame{
         // this includes points earned from the click, and all other tiles revealed from the click in the event of a 0.
         console.log('revoking click');
     }
+    userChord(){
+        console.log('chording');
+    }
     revokeChord(){
         // revokes the ownership of a chord input...
         //
+    }
+    /**
+     * A reveal tile function that skips checking if the tile has already been reveraled, but respects PPP.
+     * Used for debugging.
+     * 
+     * @param {Number} x coordinate
+     * @param {Number} y coordinate
+     */
+    _debugForceClick(x,y){ 
+        // **skip checking if tile is revealed**
+
+        // "if revealed, dont send" is the logic that would be used in a real click function
+
+        // if not revealed, dont send (prevents desyncs)
+        if(!this.state.board[x][y].revealed) return;
+
+        // send click
+        this.conn.send({type: leftClick,x,y,});
+
+        // if user has ppp on the tile
+        if(this.state.board[x][y].ppp == this.player){
+            // reclaim tiles
+            const points = this.state.reclaimTiles(this.player,x,y);
+            this.render.drawAll();
+            this.render.highlight(this.mouseHandler.curX, this.mouseHandler.curY);
+        }
     }
 }
 

@@ -12,13 +12,13 @@ const theme = {
     p2Background2: '#c8c8df',
     cover1: '#474798',
     cover2: '#5050a5',
+    coverBorder: '#383868',
     revealFlagCover1: '#8484AC', //'#2c2c8a',
     revealFlagCover2: '#8C8CB7', //'#30309c',
     p1FlagFill: '#e0345f',
     p1FlagStroke: '#ab1a3e',
     p2FlagFill: '#34c6e0', 
     p2FlagStroke: '#239dc2',
-    coverBorder: '#404080',
     _1: '#0000f0',
     _2: '#008000',
     _3: '#f00000',
@@ -50,7 +50,7 @@ function xor(a,b) {
 // could also do a != b;
 
 export default class BoardRender{
-    constructor(canvasRef, gameState, px, real, versus, submitClick, submitFlag, submitChord){
+    constructor(canvasRef, gameState, px, real, versus){
         this.real = real;
         this.versus = versus;
         this.state = gameState;
@@ -65,8 +65,9 @@ export default class BoardRender{
         this.ctx.font = `${px * .6}px Impact`;
         this.ctx.textAlign = 'center';
         
+        
         this.drawAll();
-
+        
         //this.drawPpp(p2);
     }
     oob(x,y){ 
@@ -121,8 +122,11 @@ export default class BoardRender{
             this.ctx.fillStyle = light ? theme.background1 : theme.background2;
         }
         this.ctx.strokeStyle = this.ctx.fillStyle;
+
+        //this.ctx.filter = 'blur(1px)';
         this.ctx.fill();
         this.ctx.stroke();
+        //this.ctx.filter = 'none';
     }
     drawFlag(x,y){
         const target = this.state.board[x][y];
@@ -174,12 +178,14 @@ export default class BoardRender{
         ctx.stroke();
 
         
-        /* 
+        
         //draw edges based on empty neighbors
-        //logic is fine, drawing lines is glitchy
+        //logic is fine, drawing lines is glitchy without blur... perhapse rewrite on a new thread or something
+        
         ctx.beginPath();
+        this.ctx.filter = 'blur(2px)';
         ctx.strokeStyle = theme.coverBorder;
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 2;
         if(x + 1 < this.state.height && this.state.board[x + 1][y].revealed){
             //draw east (x) boarder
             ctx.moveTo((x + 1) * px, y * px);
@@ -202,7 +208,9 @@ export default class BoardRender{
         }
         ctx.stroke();
         ctx.lineWidth = 1;
-        */
+        this.ctx.filter = 'none';
+        
+        
     }
     highlight(x,y){
         if(this.oob(x,y)) return;

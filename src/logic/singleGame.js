@@ -16,21 +16,20 @@ export default class SingleGame{
         this.height = height;
         this.width = width;
         this.mines = mines;
-        this.boardRef = boardRef;
+        this.renderRef = boardRef;
         this.px = px;
-        this.boardState = new State(height, width, mines, 1, true);
-        this.board = new BoardRender(
+        this.state = new State(height, width, mines, 1, true);
+        this.render = new BoardRender(
             boardRef, 
-            this.boardState, 
+            this.state, 
             px, 
             true, // real flag
-            true // versus flag, true for testing purposes
+            false // versus flag, true for testing purposes
         );
         this.mouseHandler = new MouseHandler(
             boardRef, 
-            this.boardState, 
-            this.board,
-            true, // real flag
+            this.state, 
+            this.render,
             (x,y) => { this.leftClick(x,y);},
             (x,y) => {      this.flag(x,y);},
             (x,y) => {     this.chord(x,y);}
@@ -41,7 +40,7 @@ export default class SingleGame{
     leftClick(x,y){
 
         //dont reveal flagged tiles
-        if(this.boardState.board[x][y].flagged){
+        if(this.state.board[x][y].flagged){
             return;
         } 
 
@@ -53,7 +52,7 @@ export default class SingleGame{
         }
 
         // recursive reveal, get points awarded for reveal
-        const points = this.boardState.revealPoints(x, y, p1, x, y);
+        const points = this.state.revealPoints(x, y, p1, x, y);
         //console.log(`scored: ${points}, total: ${this.points += points}`);
         if( points < 0){
             // game lost!
@@ -61,27 +60,27 @@ export default class SingleGame{
             return;
         }
 
-        if(this.boardState.clear){
+        if(this.state.clear){
             // game won
             console.log('game over!');
             return;
         }
     }
     flag(x,y){
-        const target = this.boardState.board[x][y];
+        const target = this.state.board[x][y];
         if(!target.revealed){
             target.flagged = !target.flagged;
         }
     }
     chord(i,j){
-        const choordTarg = this.boardState.board[i][j];
+        const choordTarg = this.state.board[i][j];
         if(!choordTarg.revealed || choordTarg.isMine) return;
         let revealList = [];
         let neighborFlagCount = 0;
 
         // count neighboring flags and save potential tile coordinates to reveal 
-        this.boardState.neighbors(i,j).forEach( ({x,y}) => {
-            const target = this.boardState.board[x][y];
+        this.state.neighbors(i,j).forEach( ({x,y}) => {
+            const target = this.state.board[x][y];
             if(target.flagged && !target.revealed){
                 ++neighborFlagCount;
             }else if(!target.flagged && !target.revealed){

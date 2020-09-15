@@ -75,46 +75,6 @@ export default class State{
         }
         return points;
     }
-    reclaimTiles(newOwner, x, y){
-
-        const originTile = this.board[x][y];
-
-        // case 1: tile at x,y is nonzero valued tile or mine
-        if(originTile.value != 0 || originTile.isMine){
-            
-            // just reclaim it, i.e. set new owner
-            console.log('reclaiming a nonzero tile @',x,y);
-            originTile.owner = newOwner;
-            return originTile.value; // return point value
-        }
-        // case 2: a zero tile...
-        if(originTile.value == 0){
-            console.log('reclaiming a zero tile @',x,y);
-            // you're finding the click that you made with the same island id as the incoming zero click,
-            // and actually uncoveered tiles. lets call it UsrClick0
-            // then you're reclaiming all the tiles whos origin is UsrClick0
-        
-            // 1. get island id associated with {x,y}
-            // 2. get origin click associated with any tile with that island id
-            
-            const origin = originTile.origin;
-            let points = 0;
-            // 3. reclaim all tiles (and their points) with the same origin click
-            for(let i = 0; i < this.width; ++i){  
-                for(let j = 0; j < this.height; ++j){
-                    const target = this.board[i][j];
-                    if(
-                        target.origin.x == originTile.origin.x && 
-                        target.origin.y == originTile.origin.y
-                    ){
-                        points += target.points;
-                        target.owner = newOwner;
-                    }
-                }
-            }
-            return points;
-        }
-    }
     placeMines(){
         let n = this.mines, x, y, target;
 
@@ -182,6 +142,54 @@ export default class State{
             }
         }
     }
+    /**
+     * Reclaims ownership of all tiles that share an origin click as the tile at (x,y)
+     * Used for keeping two clients states in sync, after ownership has been determined by the method's caller.
+     * 
+     * @param {String} newOwner name of new owner
+     * @param {Number} x coordinate
+     * @param {Number} y coordiante
+     */
+    reclaimTiles(newOwner, x, y){
+
+        const originTile = this.board[x][y];
+
+        // case 1: tile at x,y is nonzero valued tile or mine
+        if(originTile.value != 0 || originTile.isMine){
+            
+            // just reclaim it, i.e. set new owner
+            console.log('reclaiming a nonzero tile @',x,y);
+            originTile.owner = newOwner;
+            return originTile.value; // return point value
+        }
+        // case 2: a zero tile...
+        if(originTile.value == 0){
+            console.log('reclaiming a zero tile @',x,y);
+            // you're finding the click that you made with the same island id as the incoming zero click,
+            // and actually uncoveered tiles. lets call it UsrClick0
+            // then you're reclaiming all the tiles whos origin is UsrClick0
+        
+            // 1. get island id associated with {x,y}
+            // 2. get origin click associated with any tile with that island id
+            
+            const origin = originTile.origin;
+            let points = 0;
+            // 3. reclaim all tiles (and their points) with the same origin click
+            for(let i = 0; i < this.width; ++i){  
+                for(let j = 0; j < this.height; ++j){
+                    const target = this.board[i][j];
+                    if(
+                        target.origin.x == originTile.origin.x && 
+                        target.origin.y == originTile.origin.y
+                    ){
+                        points += target.points;
+                        target.owner = newOwner;
+                    }
+                }
+            }
+            return points;
+        }
+    }
     neighbors(x,y) {
         const h = this.height, w = this.width;
         const neighbors = [
@@ -206,7 +214,7 @@ export default class State{
         return (this.height * this.width) - this.uncoveredSafeTiles === this.mines;
     }
 
-    // unused? 
+    // unused...
 
     placeIslandIds(){
         let id = 0;
