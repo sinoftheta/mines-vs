@@ -35,8 +35,8 @@ const store = new Vuex.Store({
         userId: 0,
         peerId: 1,
         seed: 69,
-        board: difficulty.intermediate,
-        mode: 'beginner' // beginner | intermediate | expert | custom 
+        board: difficulty.expert,
+        mode: 'expert' // beginner | intermediate | expert | custom 
     }),
     actions: {
         init({_state, commit}){

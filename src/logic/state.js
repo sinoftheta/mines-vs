@@ -79,8 +79,9 @@ export default class State{
         let n = this.mines, x, y, target;
 
         while(n > 0){
-            y = Math.floor(this.rng() * this.height );
             x = Math.floor(this.rng() * this.width  );
+            y = Math.floor(this.rng() * this.height );
+            
 
             target = this.board[x][y];
 
@@ -228,9 +229,10 @@ export default class State{
         let newMines = []; //[{x:i,y:j}];//.concat(targetNeighbors)  // always need to replace numbers at (i,j) and its neighbors
         let a, b;
         while(mines > 0){
-            a = Math.floor(this.rng() * this.height );
-            b = Math.floor(this.rng() * this.width  );
+            a = Math.floor(this.rng() * this.width  );
+            b = Math.floor(this.rng() * this.height );
 
+            console.log(a,b);
             const target = this.board[a][b];
             
             if(
