@@ -25,6 +25,11 @@ const router = new Router({
             name: 'Race',
             component: Race
         },
+        {
+            path: '/anti',
+            name: 'AntiMine',
+            component: AntiMine
+        },
         */
         {
             path: '/solo',

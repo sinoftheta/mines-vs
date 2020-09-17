@@ -87,6 +87,8 @@ export default class MouseHandler{
                 break;
             case rightMouse:
                 this.submitFlag(this.curX, this.curY);
+                this.render.drawAll();
+                this.render.highlight(this.curX, this.curY);
                 break;
             case middleMouse:
                 this.render.anticipateChord(this.curX, this.curY);

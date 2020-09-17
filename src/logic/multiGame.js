@@ -16,6 +16,8 @@ import {p1, p2} from '@/logic/const.js';
  * 
  * all operations are communitive, meaning the order in which they are applied to the board does not matter
  * both player states will resolve to the same final state as long as all inputs are received by both players.
+ * 
+ * this is a bit of a god class...
  */
 
 // transmission types:
@@ -23,17 +25,15 @@ const handshake = 'handshake'; //connection established
 const settings = 'settings';  //settings transmitted
 const standby = 'standby'; // waiting for players to be ready
 const start = 'start'; //signal countdown timer to begin
+const restart = 'restart';
 //=-=-=-=-=-=-=-=-//
 const leftClick = 'lclick';
 const flag = 'flag';
 const chord = 'chord';
 const ping = 'ping';
-const realign = 'realign'; //contains a list of tile coords?
 
 const pingInterval = 1000; // ms
 const countdownTime = 100; // ms
-// client states
-
 
 export default class MultiGame{
     constructor(
@@ -149,14 +149,18 @@ export default class MultiGame{
                 this.clientReady = false;
                 this.setBoardSync();
                 this.conn.send({type: start});
-                this.startCountDownUI(countdownTime)
+                this.startCountDownUI(countdownTime);
+                this.multiplayerInit();
                 setTimeout(() => {this.startGame();}, countdownTime);
                 break;
             case leftClick:
-                this.opponentLeftClick(data.x, data.y, data.gameTime);
+                this.opponentLeftClick(data.x, data.y);
                 break;
             case flag:
                 this.opponentFlag(data.x, data.y);
+                break;
+            case chord:
+                this.opponentChord(data.list);
                 break;
             case ping:
                 this.handlePing();
@@ -177,18 +181,23 @@ export default class MultiGame{
                 break;
             case start:
                 const adjustedCountTime = countdownTime; // - prevrtt / 2 
-                this.startCountDownUI(adjustedCountTime) 
+                this.startCountDownUI(adjustedCountTime);
+                this.multiplayerInit();
                 setTimeout(() => {this.startGame();}, adjustedCountTime);
                 break;
             case leftClick:
-                this.opponentLeftClick(data.x, data.y, data.gameTime);
+                this.opponentLeftClick(data.x, data.y);
                 break;
             case flag:
                 this.opponentFlag(data.x, data.y);
                 break;
+            case chord:
+                this.opponentChord(data.list);
+                break;
             case ping:
                 this.handlePing();
                 break;
+
         }
     }
     handlePing(){
@@ -226,19 +235,19 @@ export default class MultiGame{
         this.gameActive = true;
 
         // reveal inital zero, do not award points or owner
-        this.state.revealPoints(this.xInit, this.yInit, '', this.xInit,this.yInit);
+        this.state.revealPoints(this.xInit, this.yInit, '', this.xInit, this.yInit);
+        this.render.drawAll();
     }
     multiplayerInit(){
 
         // find coordinates near center
+        // x and y are randomly selected from the center 20% of the board
+        this.xInit = Math.floor(this.width * 0.5)  + (this.state.rng() > 0.5 ? 1 : -1) * Math.floor(this.width * 0.2);
+        this.yInit = Math.floor(this.height * 0.5) + (this.state.rng() > 0.5 ? 1 : -1) * Math.floor(this.height * 0.2);
 
-
-        // save for fitst click
-        this.xInit = 0;
-        this.yInit = 0;
-
+        console.log('init click ',this.xInit, ',',this.yInit)
         // force tile at coordinate to be a zero tile
-        this.state.forceZero(x,y);
+        this.state.forceZeroAt(this.xInit,this.yInit);
 
         // calculate ppp
         this.state.placeIslandIds();
@@ -248,10 +257,9 @@ export default class MultiGame{
     userLeftClick(x,y){
         if(!this.gameActive || this.state.board[x][y].revealed) return; // dont send click signal if tile is revealed, owner irrelevant
 
-
         const points = this.state.revealPoints(x,y, this.player, x,y);
 
-        this.conn.send({type: leftClick,x,y,});
+        this.conn.send({type: leftClick,x,y});
 
         console.log(`you scored: ${points}, your total: ${this.userPoints += points}`);
 
@@ -262,20 +270,10 @@ export default class MultiGame{
         }
     }
     opponentLeftClick(x,y){
-
-        // create a dictionary with x,y as the key, and the timestamp & owner & point value of click as the value
-        /*
-        let hub = {
-            _1_2: {ts: 123, owner: 'host', points: 12}
-        }
-        * *idea could be used in future
-        */
-
         // before the game starts, each tile will be randomly assigned a "player point priority." 
         // This value will determine the ownership of a click in the event of a tie.
         // if we receive an opponent click that has already been executed on the board, we look to the "player point priority" value
         // of the tile
-
 
         const target = this.state.board[x][y];
         // if tile is revealed, look to the player point priority of the tile to determine if the opponent gets the tile, or if the click is ignored by the client
@@ -325,19 +323,67 @@ export default class MultiGame{
             // unflag regardless of ownership
         
         target.flagged = !target.flagged;
-        target.owner = target.flagged? this.opponent : null;
+        target.owner   = target.flagged? this.opponent : null;
         
 
         this.render.drawAll();
         this.render.highlight(this.mouseHandler.curX, this.mouseHandler.curY);
 
     }
-    userChord(){
+    userChord(i,j){
         console.log('chording');
+        if(!this.gameActive) return;
+
+        const {points, revealList} = this.resolveChord(i,j, this.player);
+        this.conn.send({type: chord, list: revealList});
+
+        this.render.drawAll();
+        this.render.highlight(this.mouseHandler.curX, this.mouseHandler.curY);
+
+        if(this.state.clear){
+            // game won
+            console.log('game over!');
+            return;
+        }
     }
-    revokeChord(){
-        // revokes the ownership of a chord input...
-        //
+    opponentChord(list){
+        console.log('opponent chording!', list);
+        list.forEach(({x,y}) => this.opponentLeftClick(x,y));
+    }
+    /**
+     * resolves a chord input on the tile at (i,j). Checks that the appropriate amount of flags are neighboring the click, and returns an array
+     * of coordinates that were uncovered, along with the points awarded from the click.
+     * @param {Number} i x coordinate of chord 
+     * @param {Number} j y coordinate of chord
+     * @param {String} owner the owner of the chord
+     */
+    resolveChord(i,j, owner){
+        let points = 0;
+
+        const choordTarg = this.state.board[i][j];
+        if(!choordTarg.revealed || choordTarg.isMine) return;
+        let revealList = [];
+        let neighborFlagCount = 0;
+
+        // count neighboring flags and save potential tile coordinates to reveal 
+        this.state.neighbors(i,j).forEach( ({x,y}) => {
+            const target = this.state.board[x][y];
+            if(target.flagged && !target.revealed){
+                ++neighborFlagCount;
+            }else if(!target.flagged && !target.revealed){
+                revealList.push({x,y});
+            }
+        });
+
+        // reveal tiles if the value matches number of surounding flags
+        if(neighborFlagCount === choordTarg.value){
+            revealList.forEach( ({x,y}) => {
+                if(this.state.board[x][y].revealed) return;
+                points += this.state.revealPoints(x,y, owner, i,j);
+            });
+        }
+
+        return {points, revealList};
     }
     /**
      * A reveal tile function that skips checking if the tile has already been reveraled, but respects PPP.
@@ -376,3 +422,12 @@ export default class MultiGame{
 // OR
 
 // slight penalty upon placing an incorrect flag
+
+
+// create a dictionary with x,y as the key, and the timestamp & owner & point value of click as the value
+/*
+let hub = {
+    _1_2: {ts: 123, owner: 'host', points: 12}
+}
+* *idea could be used in future
+*/
