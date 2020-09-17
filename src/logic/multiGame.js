@@ -43,7 +43,8 @@ export default class MultiGame{
         mines,
         px,
         onIdGenerate, //callback to display users connect code once it has been generated
-        startCountDownUI // returns a promise after countdown has started
+        startCountDownUI, // returns a promise after countdown has started
+        opponentConnectCode, // used when client is given a challenge link with an opponent connect code already created
         ){
 
         // save stuff
@@ -68,6 +69,8 @@ export default class MultiGame{
 
         this.userPoints = 0;
         this.opponentPoints = 0;
+        this.xInit = 0;
+        this.yInit = 0;
 
         // Register with the peer server
         if(process.env.VUE_APP_USE_PUBLIC_PEERJS == 'true'){
@@ -112,6 +115,9 @@ export default class MultiGame{
             });
             this.conn.on('data', (data) => this.clientSwitch(data));
         });
+
+        // use opponent code if supplied
+        if(opponentConnectCode) this.opponentCode = opponentConnectCode;
     }
     set opponentCode(code){
         // start connection as host
@@ -218,13 +224,35 @@ export default class MultiGame{
         console.log('go!');
         this.gameStartTime = Date.now();
         this.gameActive = true;
+
+        // reveal inital zero, do not award points or owner
+        this.state.revealPoints(this.xInit, this.yInit, '', this.xInit,this.yInit);
+    }
+    multiplayerInit(){
+
+        // find coordinates near center
+
+
+        // save for fitst click
+        this.xInit = 0;
+        this.yInit = 0;
+
+        // force tile at coordinate to be a zero tile
+        this.state.forceZero(x,y);
+
+        // calculate ppp
+        this.state.placeIslandIds();
+        this.state.placePpp();
+
     }
     userLeftClick(x,y){
-        if(!this.gameActive || this.state.board[x][y].revealed) return; //?
-        //const gameTime = Date.now() - this.gameStartTime;
-        //console.log('SENDING TS:', gameTime);
+        if(!this.gameActive || this.state.board[x][y].revealed) return; // dont send click signal if tile is revealed, owner irrelevant
+
+
         const points = this.state.revealPoints(x,y, this.player, x,y);
+
         this.conn.send({type: leftClick,x,y,});
+
         console.log(`you scored: ${points}, your total: ${this.userPoints += points}`);
 
         if(this.state.clear){
@@ -236,9 +264,12 @@ export default class MultiGame{
     opponentLeftClick(x,y){
 
         // create a dictionary with x,y as the key, and the timestamp & owner & point value of click as the value
-        /*let hub = {
+        /*
+        let hub = {
             _1_2: {ts: 123, owner: 'host', points: 12}
-        }*/
+        }
+        * *idea could be used in future
+        */
 
         // before the game starts, each tile will be randomly assigned a "player point priority." 
         // This value will determine the ownership of a click in the event of a tie.
@@ -250,7 +281,7 @@ export default class MultiGame{
         // if tile is revealed, look to the player point priority of the tile to determine if the opponent gets the tile, or if the click is ignored by the client
         if(target.revealed && target.ppp == this.opponent){
             console.log('opponent click overriding at:',x,y)
-            const points = this.state.reclaimTiles(this.opponent,x,y);
+            const points = this.state.reclaimTiles(this.opponent, x,y);
         }
         else if(!target.revealed){
             console.log('opponent click at:',x,y);
@@ -300,11 +331,6 @@ export default class MultiGame{
         this.render.drawAll();
         this.render.highlight(this.mouseHandler.curX, this.mouseHandler.curY);
 
-    }
-    revokeClick(){
-        // change ownership of click due to a tie
-        // this includes points earned from the click, and all other tiles revealed from the click in the event of a 0.
-        console.log('revoking click');
     }
     userChord(){
         console.log('chording');

@@ -46,7 +46,10 @@ export default class SingleGame{
 
         // keep track of first game click
         if(this.firstClick){
-            // redistribute mines around x,y
+            
+            //guarentee zero on first click
+            this.state.forceZeroAt(x,y);
+
             // start timer
             this.firstClick = false;
         }

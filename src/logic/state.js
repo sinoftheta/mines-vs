@@ -22,7 +22,7 @@ export default class State{
         this.rng = seedrandom(`${seed}${mines}${height}${width}`);
         this.uncoveredSafeTiles = 0;
         this.board = [];
-        this.mineList = [];
+        //this.mineList = [];
         
         // allocate board
         for(let i = 0; i < this.width; ++i){
@@ -35,9 +35,7 @@ export default class State{
         // init board
         if(real){
             this.placeMines();
-            this.placeNumbers();
-            this.placeIslandIds();
-            this.placePpp();
+            this.placeNumbersOverArea(0,0,this.width,this.height);
         }
     }
     revealPoints(i,j,owner, originX, originY){
@@ -73,6 +71,8 @@ export default class State{
                 points += this.revealPoints(x,y, owner, originX, originY);
             });
         }
+
+        // tile is a nonzero value 
         return points;
     }
     placeMines(){
@@ -88,28 +88,42 @@ export default class State{
             if(!target.isMine){
                 target.isMine = true;
                 target.value = 9;
-                this.mineList.push({x,y});
+                //this.mineList.push({x,y});
                 --n;
             }
         }
-        this.mineList.sort((a,b) => {
+        /*this.mineList.sort((a,b) => {
             if(a.x > b.x) return 1;
             if(a.x < b.x) return -1;
             if(a.y > b.y) return 1;
             return -1; 
         });
+        */
         //console.log(this.mineList);
     }
-    placeNumbers(){
-        for(let i = 0; i < this.width; ++i){
-            for(let j = 0; j < this.height; ++j){
-                // assign random ppp. there are better ways to do this will do for now
-                // can also be done in constructor, really doesnt matter
-                this.board[i][j].ppp = this.rng() > 0.5 ? p1 : p2;
+    /**
+     * Calculates tile values based on the number of surrounding mines.
+     * Values are only calculated for tiles within the rectangle defined by the
+     * two points (x1,y1) and (x2,y2).
+     * 
+     * @param {Number} x1 lower x coordinate of rectangle to place numbers over
+     * @param {Number} y1 lower y coordinate of rectangle to place numbers over
+     * @param {Number} x2  upper x coordinate of rectangle to place numbers over
+     * @param {Number} y2  upper x coordinate of rectangle to place numbers over
+     */
+    placeNumbersOverArea(x1, y1, x2, y2){
+        console.log(`placing numbers from [ (${x1},${y1}) to (${x2},${y2}) )`);
+        for(let i = x1; i < x2; ++i){
+            for(let j = y1; j < y2; ++j){
 
+                
+
+                this.board[i][j].value = 0;
                 this.neighbors(i,j).forEach( ({x,y}) => {
                     if(this.board[x][y].isMine) this.board[i][j].value++
                 });
+
+                //if(i == 15 && j == 7) console.log(this.board[i][j].value)
                 //TODO: turn these into tests
 
                 //if(this.neighbors(i,j).length < 3) console.log(i,j)
@@ -129,8 +143,7 @@ export default class State{
         const rand = this.rng() > 0.5 ? 0 : 1;
         for(let i = 0; i < this.width; ++i){
             for(let j = 0; j < this.height; ++j){
-                // assign random ppp. there are better ways to do this will do for now
-                // can also be done in constructor, really doesnt matter
+                // assign random ppp. there are better ways to do this, this will do for now
                 // all members with the same islandId must have the same ppp
                 if(this.board[i][j].value == 0){
                     this.board[i][j].ppp = (rand + this.board[i][j].islandId) % 2 == 0 ? p1 : p2;
@@ -190,6 +203,66 @@ export default class State{
             return points;
         }
     }
+    
+    
+    /**
+     * Forces the tile at (i,j) to have a zero value, while preserving the validity of the board and the number of mines. 
+     * @param {Number} i x coordinate of tile that will be zero
+     * @param {Number} j y coordinate of tile that will be zero
+     */
+    forceZeroAt(i,j){
+        let mines = this.board[i][j].value;
+        //if( mines == 0) return;
+
+
+        console.log('forcing zero at ',i,j);
+        // clear mines from (i,j) and it's neighbors
+        this.board[i][j].isMine = false;
+        this.board[i][j].value = 0;
+        this.neighbors(i,j).forEach( ({x,y}) => {
+            this.board[x][y].isMine = false;
+            //this.board[x][y].value = 0;
+        });
+
+        // replace mines
+        let newMines = []; //[{x:i,y:j}];//.concat(targetNeighbors)  // always need to replace numbers at (i,j) and its neighbors
+        let a, b;
+        while(mines > 0){
+            a = Math.floor(this.rng() * this.height );
+            b = Math.floor(this.rng() * this.width  );
+
+            const target = this.board[a][b];
+            
+            if(
+                !target.isMine &&          // no mine already at x,y
+                !(a == i && b == j) &&     // target is not origin
+                this.neighbors(i,j).every( // (a,b) is not a neighbor of origin
+                    ({x,y}) => 
+                    !(a == x && b == y) 
+            )){
+                target.isMine = true;
+                target.value = 9;
+                newMines.push({x:a,y:b});
+                --mines;
+            }
+        }
+
+        // recalc a radius 1 square around newly placed mines
+        newMines.forEach(({x,y}) => {
+            const nc = this.normalizeRectangle(x - 1, y - 1, x + 1, y + 1);
+            this.placeNumbersOverArea(nc.x1, nc.y1, nc.x2 + 1, nc.y2 + 1);
+        });
+
+        const nc = this.normalizeRectangle(i - 2, j - 2, i + 2, j + 2);
+        this.placeNumbersOverArea(nc.x1, nc.y1, nc.x2 + 1, nc.y2 + 1);
+
+        // recalc a radius 3 square around first click
+    }
+    /**
+     * returns an array of coordinates of the neighbors of the tile at (x,y)
+     * @param {Number} x x coordinate of tile whos neighbors will be returned
+     * @param {Number} y y coordinate of tile whos neighbors will be returned
+     */
     neighbors(x,y) {
         const h = this.height, w = this.width;
         const neighbors = [
@@ -209,13 +282,33 @@ export default class State{
             n.y < 0  
         ));
     }
+    normalizeRectangle(x1,y1,x2,y2){
+        if(x1 < 0) x1 = 0;
+        if(x1 >= this.width) x1 = this.width - 1;
+
+        if(y1 < 0) y1 = 0;
+        if(y1 >= this.height) y1 = this.height - 1;
+
+        if(x2 < 0) x2 = 0;
+        if(x2 >= this.width) x2 = this.width - 1;
+
+        if(y2 < 0) y2 = 0;
+        if(y2 >= this.height) y2 = this.height - 1;
+    
+        console.log(x1,y1,x2,y2);
+        return {x1,y1,x2,y2};
+    }
+    /*
+     * clear status of the board; returns true when all mines have been uncovered
+     */
     get clear(){
-        // area - uncovered = mines
+        // area - uncovered == mines
         return (this.height * this.width) - this.uncoveredSafeTiles === this.mines;
     }
 
-    // unused...
-
+    /*
+     * 
+     */
     placeIslandIds(){
         let id = 0;
         for(let i = 0; i < this.width; ++i){
@@ -232,6 +325,13 @@ export default class State{
             }
         }
     }
+    /**
+     * helper function for placeIslandIds(). Recursively finds contiguous zero-valued 
+     * neighbor tiles of the tile at (i,j), and sets their islandId field to id
+     * @param {Number} i x coordinate
+     * @param {Number} j y coordinate
+     * @param {Number} id id that will be assigned to the island
+     */
     markIslandRecursive(i, j, id){
         const target = this.board[i][j];
         if (target.checked) return;
@@ -243,8 +343,6 @@ export default class State{
                 this.markIslandRecursive(x, y, id);
             }
         });
-
-
     }
     uncheckAll(){
         for(let i = 0; i < width; ++i){
