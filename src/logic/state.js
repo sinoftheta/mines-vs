@@ -113,7 +113,7 @@ export default class State{
      * @param {Number} y2  upper x coordinate of rectangle to place numbers over
      */
     placeNumbersOverArea(x1, y1, x2, y2){
-        console.log(`placing numbers from [ (${x1},${y1}) to (${x2},${y2}) )`);
+        //console.log(`placing numbers from [ (${x1},${y1}) to (${x2},${y2}) )`);
         for(let i = x1; i < x2; ++i){
             for(let j = y1; j < y2; ++j){
 
@@ -232,7 +232,7 @@ export default class State{
             a = Math.floor(this.rng() * this.width  );
             b = Math.floor(this.rng() * this.height );
 
-            console.log(a,b);
+            //console.log(a,b);
             const target = this.board[a][b];
             
             if(
@@ -297,7 +297,7 @@ export default class State{
         if(y2 < 0) y2 = 0;
         if(y2 >= this.height) y2 = this.height - 1;
     
-        console.log(x1,y1,x2,y2);
+        //console.log(x1,y1,x2,y2);
         return {x1,y1,x2,y2};
     }
     /*

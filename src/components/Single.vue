@@ -24,9 +24,9 @@ export default {
     mounted(){
         game = new SingleGame(
             this.$refs.boardCanvas,
-            this.$store.state.board.height,
-            this.$store.state.board.width,
-            this.$store.state.board.mines,
+            this.$store.state.height,
+            this.$store.state.width,
+            this.$store.state.mines,
             35
             );
     }

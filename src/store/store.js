@@ -35,7 +35,7 @@ const store = new Vuex.Store({
         userId: 0,
         peerId: 1,
         seed: 69,
-        board: difficulty.expert,
+        ...difficulty.expert,
         mode: 'expert' // beginner | intermediate | expert | custom 
     }),
     actions: {
@@ -53,7 +53,17 @@ const store = new Vuex.Store({
         /* Vue.set(object, key, value) */
         //setGroup(state, group){Vue.set(state, 'group', group);}
         userId(state, id){Vue.set(state, 'userId', id)},
-        peerId(state, id){Vue.set(state, 'peerId', id)}
+        peerId(state, id){Vue.set(state, 'peerId', id)},
+        height(state, h ){Vue.set(state, 'height', h ); Vue.set(state, 'mode', 'custom' );},
+        width (state, w ){Vue.set(state, 'width' , w ); Vue.set(state, 'mode', 'custom' );},
+        mines (state, m) {Vue.set(state, 'mines' , m ); Vue.set(state, 'mode', 'custom' );},
+        mode  (state, mode){
+            if(!difficulty[mode]) return;
+            Vue.set(state, 'mode'  , mode );
+            Vue.set(state, 'height', difficulty[mode].height ); 
+            Vue.set(state, 'width' , difficulty[mode].width  );
+            Vue.set(state, 'mines' , difficulty[mode].mines  );
+        },
     }
 });
 
