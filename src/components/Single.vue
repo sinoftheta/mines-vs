@@ -3,7 +3,6 @@
         <div>Solo</div>
         <div>{{minesRemaining}}</div>
         <canvas ref="boardCanvas"></canvas>
-        <Nav></Nav>
     </div>
 </template>
 

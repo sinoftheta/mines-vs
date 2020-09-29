@@ -9,7 +9,6 @@
             v-model="peerId" 
             placeholder="opponent id"
         ></textarea>
-        <Nav></Nav>
     </div>
 </template>
 

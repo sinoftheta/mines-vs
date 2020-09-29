@@ -9,7 +9,15 @@
 
 export default {
     name: 'Nav',
-    methods: {goto(route){this.$router.push({path: route});}}
+    methods: {
+        goto(route)
+        {this.$router.push({path: route});}
+    },
+    computed:{
+        currentRouteName() {
+            return this.$route.name;
+        }
+    }
 }
 </script>
 

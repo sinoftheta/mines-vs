@@ -34,7 +34,6 @@
                 @input="setOpponentCode"
             >
         </div>
-        <Nav></Nav>
     </div>
 </template>
 
