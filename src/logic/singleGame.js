@@ -18,7 +18,7 @@ export default class SingleGame{
         this.mines = mines;
         this.renderRef = boardRef;
         this.px = px;
-        this.state = new State(height, width, mines, 1, true);
+        this.state  = new State(height, width, mines, Math.random(), true);
         this.render = new BoardRender(
             boardRef, 
             this.state, 
