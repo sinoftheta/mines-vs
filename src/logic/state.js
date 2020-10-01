@@ -13,8 +13,14 @@ c.toString(16).padStart(2, 0) + (i === a.length - 1 || i % 16 === 15 ?
 r + (v > 31 && v < 127 || v > 159 ? String.fromCharCode(v) : '.'), '  ') + '\n' : ''), ''));
 
 
-
 export default class State{
+    /**
+     * @param {Number} height height of the board
+     * @param {Number} width width of the board
+     * @param {Number} mines nimber of mines to be placed on the board
+     * @param {Any} seed seed for RNG
+     * @param {Boolean} real flag to place mines and numbers
+     */
     constructor(height, width, mines, seed, real){
         this.width = width;
         this.height = height;
