@@ -1,11 +1,5 @@
 
-import {p1,p2} from '@/logic/const.js';
-
-// mouse button constants
-const none = 0;
-const leftMouse = 1;
-const rightMouse = 2;
-const middleMouse = 4;
+import {p1,p2, none, leftMouse, rightMouse, middleMouse} from '@/logic/const.js';
 
 export default class MouseHandler{
     constructor(canvasRef, gameState, boardRender, submitClick, submitFlag, submitChord, _debugForceClick){

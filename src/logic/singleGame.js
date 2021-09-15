@@ -2,7 +2,7 @@ import State from '@/logic/state';
 import BoardRender from '@/logic/boardRender';
 import MouseHandler from './mouseHandler';
 
-import {p1,p2} from '@/logic/const.js'; // for debugging purposes - multiplayer features are tested in singleplayer first
+import {p1} from '@/logic/const.js'; // for debugging purposes - multiplayer features are tested in singleplayer first
 
 export default class SingleGame{
     constructor(
@@ -10,7 +10,8 @@ export default class SingleGame{
         height, 
         width, 
         mines,
-        px
+        px,
+        onEnd // callback for when the game finishes
         ){
         // save stuff
         this.height = height;
@@ -24,7 +25,7 @@ export default class SingleGame{
             this.state, 
             px, 
             true, // real flag
-            false // versus flag, true for testing purposes
+            false // versus flag
         );
         this.mouseHandler = new MouseHandler(
             boardRef, 
@@ -35,6 +36,7 @@ export default class SingleGame{
             (x,y) => {     this.chord(x,y);}
         );
         this.firstClick = true;
+        this.onEnd = (win) => { onEnd(win); };
         this.points = 0;
     }
     leftClick(x,y){

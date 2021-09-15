@@ -74,6 +74,7 @@ export default class BoardRender{
         return x >= this.state.width || x < 0 || y >= this.state.height || y < 0;  
     }
     drawAll(){
+        // const start = Date.now();
         const ctx = this.ctx;
         const state = this.state;
         const px = this.px;
@@ -83,6 +84,7 @@ export default class BoardRender{
                 this.drawTileState(i,j);
             }
         }
+        // console.log('elapsed: ', Date.now() - start, 'ms');
     }
     drawTileState(i,j){
         //TODO: break into drawValue(x,y,n), drawMine(x,y), drawCover(x,y)

@@ -1,8 +1,8 @@
 <template>
     <div>
         <div>Solo</div>
-        <div>{{minesRemaining}}</div>
         <canvas ref="boardCanvas"></canvas>
+        <div>remaining: {{minesRemaining}}</div>
     </div>
 </template>
 
@@ -10,25 +10,31 @@
 import Nav from '@/components/Nav';
 import SingleGame from '@/logic/singleGame.js';
 
-var game;
-
 export default {
     name: 'Single',
     components:{Nav},
-    data(){
+    data: function () {
+        this.game = null; // important https://stackoverflow.com/questions/68602389/maximum-call-stack-error-when-attempting-to-update-chart-in-vue-js
         return {
-            minesRemaining: 0
-    }},
+            minesRemaining: this.$store.state.mines
+        };
+    },
     methods:{
+        onEnd(win){
+            // play win/lose animation
+            // show play again button
+            
+            // game.restart();
+        },
     },
     mounted(){
-        game = new SingleGame(
+        this.game = new SingleGame(
             this.$refs.boardCanvas,
             this.$store.state.height,
             this.$store.state.width,
             this.$store.state.mines,
             35
-            );
+        );
     }
 
 }

@@ -41,19 +41,20 @@
 import Nav from '@/components/Nav';
 import MultiGame from '@/logic/multiGame.js';
 
-var game;
-
 export default {
     name: 'Vs',
     components:{Nav},
-    data(){
+    data: function(){
+
+        this.game = null;
         return {
             userConnectCode: 'generating code...',
             opponentConnectCode: '',
             userScore: 0,
             opponentScore: 0,
             minesRemaining: 0
-    }},
+        }
+    },
     methods:{
         setUserConnectCode(code){
             //console.log('dat code:', code)
@@ -67,7 +68,7 @@ export default {
         copyChallengeLink(){
             this.$copyText(this.challengeUrl());
         },
-        setOpponentCode(e){game.opponentCode = e.target.value;},
+        setOpponentCode(e){this.game.opponentCode = e.target.value;},
         startCountDown(time){
             //spawn count down modal
             console.log('counting down:', time);
@@ -85,7 +86,7 @@ export default {
             console.log('opponent code:',this.$route.query.challenge);
         }
         
-        game = new MultiGame(
+        this.game = new MultiGame(
             this.$refs.boardCanvas,
             this.$store.state.height,
             this.$store.state.width,
