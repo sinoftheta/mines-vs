@@ -22,11 +22,9 @@
 </template>
 
 <script>
-import Nav from '@/components/Nav';
 
 export default {
     name: 'Settings',
-    components:{Nav},
     computed: {
         mines:{
             get(){return this.$store.state.mines;},

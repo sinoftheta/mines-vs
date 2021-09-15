@@ -1,9 +1,9 @@
 import Vue      from 'vue';
 import Router   from 'vue-router';
 
-import Vs       from '@/components/Vs';
-import Settings from '@/components/Settings';
-import Single   from '@/components/Single';
+import Vs       from '@/views/Vs';
+import Settings from '@/views/Settings';
+import Single   from '@/views/Single';
 
 Vue.use(Router);
 

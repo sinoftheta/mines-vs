@@ -7,12 +7,10 @@
 </template>
 
 <script>
-import Nav from '@/components/Nav';
 import SingleGame from '@/logic/singleGame.js';
 
 export default {
     name: 'Single',
-    components:{Nav},
     data: function () {
         this.game = null; // important https://stackoverflow.com/questions/68602389/maximum-call-stack-error-when-attempting-to-update-chart-in-vue-js
         return {

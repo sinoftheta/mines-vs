@@ -38,12 +38,10 @@
 </template>
 
 <script>
-import Nav from '@/components/Nav';
 import MultiGame from '@/logic/multiGame.js';
 
 export default {
     name: 'Vs',
-    components:{Nav},
     data: function(){
 
         this.game = null;
