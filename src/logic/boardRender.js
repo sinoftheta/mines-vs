@@ -157,17 +157,46 @@ export default class BoardRender{
         this.ctx.fillText(n, (x + 0.5) * this.px, (y + 0.5) * this.px + 7);
     } 
     drawMine(x,y){
-        //draw mine
-        this.ctx.beginPath();
-        this.ctx.fillStyle = theme.mine;
-        //this.ctx.lineWidth = 0;
-        this.ctx.arc(
+        const ctx = this.ctx;
+        ctx.beginPath();
+        ctx.fillStyle = theme.mine;
+        ctx.arc(
             (x + 0.5) * this.px, 
             (y + 0.5) * this.px, 
-            this.px * 0.25, 
+            this.px * 0.24, 
             0, 
-            2 * Math.PI);
-        this.ctx.fill();
+            2 * Math.PI
+        );
+
+        ctx.rect(
+            (x + 0.3) * this.px,
+            (y + 0.3) * this.px,
+            0.4 * this.px,
+            0.4 * this.px,
+        );
+
+        ctx.moveTo( // left of diamond
+            (x + 0.21) * this.px, 
+            (y + 0.5) * this.px    
+        );
+        ctx.lineTo( // top of diamond
+            (x + 0.5) * this.px,
+            (y + 0.21) * this.px
+        );
+        ctx.lineTo( // right of diamond
+            (x + 0.79) * this.px,
+            (y + 0.5) * this.px 
+        );
+        ctx.lineTo( // bottom of diamond
+            (x + 0.5) * this.px,
+            (y + 0.79) * this.px 
+        );
+        ctx.closePath();
+
+
+        ctx.fill();
+
+
     }
     drawCover(x,y){
         const ctx = this.ctx;
