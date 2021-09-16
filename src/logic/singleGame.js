@@ -5,13 +5,21 @@ import MouseHandler from './mouseHandler';
 import {p1} from '@/logic/const.js'; // for debugging purposes - multiplayer features are tested in singleplayer first
 
 export default class SingleGame{
+    /**
+     * @param {Element}  boardRef a reference to an html canvas that the board will be rendered on
+     * @param {Number}   height height of the board
+     * @param {Number}   width width of the board
+     * @param {Number}   mines nimber of mines to be placed on the board
+     * @param {Number}   px size of game tiles in pixels
+     * @param {Function} onEnd onEnd(Boolean win) callback that is executed when the game is finished
+     */
     constructor(
         boardRef, 
         height, 
         width, 
         mines,
         px,
-        onEnd // callback for when the game finishes
+        onEnd
         ){
         // save stuff
         this.height = height;
@@ -41,7 +49,7 @@ export default class SingleGame{
     }
     leftClick(x,y){
 
-        //dont reveal flagged tiles
+        // dont reveal flagged tiles
         if(this.state.board[x][y].flagged){
             return;
         } 
@@ -49,10 +57,12 @@ export default class SingleGame{
         // keep track of first game click
         if(this.firstClick){
             
-            //guarentee zero on first click
+            // guarentee zero on first click
             this.state.forceZeroAt(x,y);
 
             // start timer
+
+
             this.firstClick = false;
         }
 
@@ -61,13 +71,13 @@ export default class SingleGame{
         //console.log(`scored: ${points}, total: ${this.points += points}`);
         if( points < 0){
             // game lost!
+            this.onEnd(false);
             // stop timer
             return;
         }
-
-        if(this.state.clear){
+        else if(this.state.clear){
             // game won
-            console.log('game over!');
+            this.onEnd(true);
             return;
         }
     }

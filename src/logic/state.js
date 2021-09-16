@@ -315,7 +315,7 @@ export default class State{
     }
 
     /*
-     * 
+     * Assigns an islandID to every mine on the board. Mines that are adjacent will share the same islandID. 
      */
     placeIslandIds(){
         let id = 0;

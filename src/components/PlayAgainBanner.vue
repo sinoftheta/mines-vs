@@ -13,7 +13,8 @@ export default {
     props: {
         gameWon: Boolean,
         multiPlayer: Boolean,
-        playAgain: Function
+        playAgain: Function,
+        show: Boolean
     },
     methods: {
         playAgainClick() {
@@ -23,9 +24,6 @@ export default {
         }
     },
     computed:{
-        show(){
-            return true;
-        }
     }
 }
 </script>
