@@ -63,6 +63,7 @@ export default class State{
             // cut points in half?
             // lose points based on mine value?  
             points -= 2 * target.value;
+            console.log("returning ", points, "target value: ", target.value, target.isMine)
             return points;
         }else{
             this.uncoveredSafeTiles++;
@@ -115,15 +116,17 @@ export default class State{
      * 
      * @param {Number} x1 lower x coordinate of rectangle to place numbers over
      * @param {Number} y1 lower y coordinate of rectangle to place numbers over
-     * @param {Number} x2  upper x coordinate of rectangle to place numbers over
-     * @param {Number} y2  upper x coordinate of rectangle to place numbers over
+     * @param {Number} x2 upper x coordinate of rectangle to place numbers over
+     * @param {Number} y2 upper x coordinate of rectangle to place numbers over
      */
     placeNumbersOverArea(x1, y1, x2, y2){
         //console.log(`placing numbers from [ (${x1},${y1}) to (${x2},${y2}) )`);
         for(let i = x1; i < x2; ++i){
             for(let j = y1; j < y2; ++j){
 
-                
+                // skip calculating new values for mines
+                // (could also do other things like give grouped mines higher values)
+                if(this.board[i][j].isMine) continue;
 
                 this.board[i][j].value = 0;
                 this.neighbors(i,j).forEach( ({x,y}) => {
