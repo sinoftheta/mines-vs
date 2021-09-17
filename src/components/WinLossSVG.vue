@@ -108,12 +108,12 @@
             </g>
         </g>
         <g class="status" @click="statusClick">
-            <!-- status outline -->
-            <path class="outline-text" d="M401.44,137.87H281.8l-19.15-19.15V96.66H240.6L215.34,71.4h140.02l46.08,46.07V137.87z M284.29,131.87h111.16v-11.92
-                L352.88,77.4H229.83l13.26,13.26h25.57v25.58L284.29,131.87z"
-            />
             <!-- "Win!" text and fill-->
-            <g v-if="gameWon" >
+            <g v-if="gameWon" class="win" >
+                <!-- status outline -->
+                <path class="outline-text" d="M401.44,137.87H281.8l-19.15-19.15V96.66H240.6L215.34,71.4h140.02l46.08,46.07V137.87z M284.29,131.87h111.16v-11.92
+                    L352.88,77.4H229.83l13.26,13.26h25.57v25.58L284.29,131.87z"
+                />
                 <path class="outline-text" d="M297.79,103.53l-3.53,15.18h-6.37l-6.61-25.65h5.44l3.57,15.71c0.16,0.67,0.33,1.44,0.52,2.31s0.34,1.72,0.46,2.55
                     c0.12-0.57,0.23-1.13,0.34-1.67c0.1-0.54,0.21-1.07,0.32-1.6c0.11-0.53,0.22-1.05,0.35-1.58l3.62-15.73h6.01l3.59,15.16
                     c0.12,0.51,0.27,1.25,0.45,2.22c0.18,0.97,0.34,2.03,0.5,3.19c0.16-0.7,0.3-1.33,0.43-1.87c0.13-0.54,0.25-1.08,0.38-1.62
@@ -144,7 +144,11 @@
                 </g>
             </g>
             <!-- "Loss" text and fill-->
-            <g v-else>
+            <g v-else class="lose">
+                <!-- status outline -->
+                <path class="outline-text" d="M401.44,137.87H281.8l-19.15-19.15V96.66H240.6L215.34,71.4h140.02l46.08,46.07V137.87z M284.29,131.87h111.16v-11.92
+                    L352.88,77.4H229.83l13.26,13.26h25.57v25.58L284.29,131.87z"
+                />
                 <path class="outline-text" d="M302.87,114.56v4.15h-19.13V93.06h5.37v21.5H302.87z"/>
                 <path class="outline-text" d="M325.33,108.84c0,3.19-0.89,5.7-2.66,7.51s-4.22,2.72-7.35,2.72c-3.07,0-5.48-0.91-7.23-2.73
                     c-1.75-1.82-2.62-4.32-2.62-7.5c0-3.17,0.87-5.66,2.62-7.47c1.75-1.81,4.19-2.72,7.34-2.72c3.22,0,5.67,0.88,7.36,2.63
@@ -219,14 +223,103 @@ export default {
 
 <style scoped>
 
-.outline-text{
+* {
+    --distance: 15px;
+}
+
+/********************** play again animations **********************/
+@keyframes play-again-fill {
+    0%{
+        transform: translateX(0px);
+        opacity: 0;
+    }
+    85%{
+        transform: translateX(0px);
+        opacity: 0;
+    }
+    100%{
+        transform: translateX(calc(-1 * var(--distance)));
+        opacity: .69;
+    }
+}
+@keyframes play-again-line-text{
+    0%{
+        transform: translateX(0px);
+        opacity: 1;
+    }
+    85%{
+        transform: translateX(0px);
+        opacity: 1;
+    }
+    100%{
+        transform: translateX(calc(-1 * var(--distance)));
+        opacity: 0;
+    }
+}
+
+/********************** status animations **********************/
+@keyframes status-fill {
+    0%{
+        transform: translateX(0px);
+        opacity: 0;
+    }
+    85%{
+        transform: translateX(0px);
+        opacity: 0;
+    }
+    100%{
+        transform: translateX(var(--distance));
+        opacity: .69;
+    }
+}
+@keyframes status-line-text{
+    0%{
+        transform: translateX(0px);
+        opacity: 1;
+    }
+    85%{
+        transform: translateX(0px);
+        opacity: 1;
+    }
+    100%{
+        transform: translateX(var(--distance));
+        opacity: 0;
+    }
+}
+
+
+.play-again .fill {
+    animation: 1690ms ease-in-out 0ms infinite alternate play-again-fill;
+}
+.play-again .outline-text {
+    animation: 1690ms ease-in-out 0ms infinite alternate play-again-line-text;
+}
+
+.win .fill,
+.lose .fill {
+    animation: 1690ms ease-in-out 35ms infinite alternate status-fill;
+}
+.win .outline-text,
+.lose .outline-text {
+    animation: 1690ms ease-in-out 35ms infinite alternate status-line-text;
+}
+
+.play-again path {
+    fill: #ffee00be;
+}
+
+.win path {
     fill: #00ff73be;
 }
-.fill {
-    fill: #00000000; 
+
+.lose path {
+    fill: #ff004cbe;
 }
+
+
+
 .status,
-.play-again{
+.play-again {
     cursor: pointer;
 }
 

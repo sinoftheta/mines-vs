@@ -2,7 +2,7 @@
     <transition name="slide">
         <div class="banner" v-if="show">
             <div>
-                <WinLossSVG :gameWon="gameWon" v-on:playAgainClick="playAgainClick" v-on:statusClick="() => {}"/>
+                <WinLossSVG :gameWon="gameWon" @playAgainClick="playAgainClick" @statusClick="statusClick"/>
             </div>
         </div>
     </transition>
@@ -26,6 +26,9 @@ export default {
         playAgainClick() {
             this.$emit('playAgainClick');
             // trigger transition out
+        },
+        statusClick(won){
+            console.log(won ? 'congradulations!' : 'sorry');
         }
     },
     computed:{
@@ -35,7 +38,7 @@ export default {
 
 <style scoped>
 * {
-    --height: 50px;
+    --height: 70px;
 }
 
 @keyframes enter {
@@ -57,7 +60,7 @@ export default {
 
 .slide-enter-active,
 .slide-leave-active {
-    animation: enter;
+    animation-name: enter;
 }
 .slide-enter-from,
 .slide-leave-to {
@@ -70,7 +73,7 @@ export default {
     width: 300vw;
     height: var(--height);
     /*background: #00000040;*/
-    background: linear-gradient(90deg, #00000000 0%, #00000060 33%, #00008055 66%, #00000000 100%);
+    background: linear-gradient(90deg, #00000000 0%, #00001060 33%, #00008055 66%, #00000000 100%);
     position: absolute;
     top: calc(50vh - var(--height) / 2);
     right: -100vw; 
