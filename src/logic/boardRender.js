@@ -13,8 +13,8 @@ const theme = {
     cover1: '#474798',
     cover2: '#5050a5',
     coverBorder: '#383868',
-    revealFlagCover1: '#8484AC', //'#2c2c8a',
-    revealFlagCover2: '#8C8CB7', //'#30309c',
+    revealFlagCover1: '#8484AC', //'#2c2c8a', flag backgrounds could get darker when mouse held down
+    revealFlagCover2: '#8C8CB7', //'#30309c', 
     p1FlagFill: '#e0345f',
     p1FlagStroke: '#ab1a3e',
     p2FlagFill: '#34c6e0', 
@@ -29,25 +29,13 @@ const theme = {
     _8: '#808080',
     _9: '#808000',
     hover: '#ffffff30',
-    enimyHover: '#00000030',
-    mine: '#000000'
+    mine: '#000040bb'
 }
-
-const none = 0;
-const leftMouse = 1;
-const rightMouse = 2;
-const middleMouse = 4;
-
 
 // flag triangle constants
 const scale = 0.65; // ratio of triangle sidelength to tile sidelength 
 const r3o2 = 0.86602540378; // sqrt(3) / 2. height of equalateral triangle
 const x_off = (1 - scale * r3o2) * 0.5;
-
-function xor(a,b) {
-    return ( a ? 1 : 0 ) ^ ( b ? 1 : 0 );
-}
-// could also do a != b;
 
 export default class BoardRender{
     constructor(canvasRef, gameState, px, real, versus){
@@ -68,10 +56,13 @@ export default class BoardRender{
         
         this.drawAll();
         
-        //this.drawPpp(p2);
+        
     }
     oob(x,y){ 
         return x >= this.state.width || x < 0 || y >= this.state.height || y < 0;  
+    }
+    checker(a,b){
+        return (a % 2 == 0) != (b % 2 == 0);
     }
     drawAll(){
         // const start = Date.now();
@@ -85,6 +76,8 @@ export default class BoardRender{
             }
         }
         // console.log('elapsed: ', Date.now() - start, 'ms');
+
+        // this.drawPpp(p2); // uncomment for ppp vis
     }
     drawTileState(i,j){
         //TODO: break into drawValue(x,y,n), drawMine(x,y), drawCover(x,y)
@@ -111,7 +104,7 @@ export default class BoardRender{
         }
     }
     drawBackground(x,y){
-        const light = xor( x % 2 == 0, y % 2 == 0);
+        const light = this.checker(x,y);
 
         // draw revealed cell
         if(this.versus && this.state.board[x][y].owner == p1){
@@ -200,7 +193,7 @@ export default class BoardRender{
     }
     drawCover(x,y){
         const ctx = this.ctx;
-        const light = xor( x % 2 == 0, y % 2 == 0);
+        const light = this.checker(x,y);
         const px = this.px;
         //draw covered cell
         ctx.strokeStyle = light ? theme.cover1 : theme.cover2;
@@ -259,7 +252,7 @@ export default class BoardRender{
     anticipateReveal(x,y){
         if(this.oob(x,y)) return;
 
-        const light = xor( x % 2 == 0, y % 2 == 0);
+        const light = this.checker(x,y);
         const target = this.state.board[x][y];
         const ctx = this.ctx, px = this.px;
         if(!target.revealed){
