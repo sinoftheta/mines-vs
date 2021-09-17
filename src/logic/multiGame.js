@@ -1,3 +1,6 @@
+
+/* eslint-disable */
+
 import State from '@/logic/state';
 import BoardRender from '@/logic/boardRender';
 import MouseHandler from '@/logic/mouseHandler';
@@ -7,6 +10,8 @@ import {p1, p2} from '@/logic/const.js';
 //https://glitch.com/edit/#!/peerjs-video?path=public%2Fmain.js%3A1%3A0
 // NOT WORKING ON LOCAL NETWORK FIX
 //   https://github.com/peers/peerjs/issues/608#issuecomment-567045127
+
+
 
 /**
  * TERMINOLOGY:
@@ -120,6 +125,8 @@ export default class MultiGame{
         if(opponentConnectCode) this.opponentCode = opponentConnectCode;
     }
     set opponentCode(code){
+
+        console.log('setting opponent code:', code);
         // start connection as host
         this.connectId = code;
         this.host = true;
