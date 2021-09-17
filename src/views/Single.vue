@@ -3,7 +3,7 @@
         <div>Solo</div>
         <canvas ref="boardCanvas"></canvas>
         <div>remaining: {{minesRemaining}}</div>
-        <PlayAgainBanner v-on:playAgain="playAgain" :show="showPlayAgainBanner"/>
+        <PlayAgainBanner v-on:playAgainClick="playAgainClick" :show="showPlayAgainBanner" :gameWon="gameWon"/>
     </div>
 </template>
 
@@ -21,17 +21,21 @@ export default {
         return {
             minesRemaining: this.$store.state.mines,
             showPlayAgainBanner: false,
+            gameWon: false,
         };
     },
     methods:{
-        onEnd(win){
-            console.log("game over! win = ", win);
+        onEnd(winStatus){
+            // console.log("game over! win = ", winStatus);
             this.showPlayAgainBanner = true;
-            // play win/lose animation
-            // show play again button
+            this.gameWon = winStatus;
+
+            // autoplay the next game if autoplay is on in the settings
+            if(this.$store.state.autoPlay){
+                this.autoPlayTimer = setTimeout(this.playAgainClick, 800);
+            }
         },
-        playAgain(){
-            console.log('playAgain()');
+        playAgainClick(){
             this.game = new SingleGame(
                 this.$refs.boardCanvas,
                 this.$store.state.height,
@@ -41,10 +45,11 @@ export default {
                 this.onEnd
             );
             this.showPlayAgainBanner = false;
+            clearTimeout(this.autoPlayTimer);
         }
     },
     mounted(){
-        this.playAgain();
+        this.playAgainClick();
     }
 
 }

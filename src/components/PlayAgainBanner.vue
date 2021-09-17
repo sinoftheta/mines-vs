@@ -1,13 +1,16 @@
 <template>
     <transition name="slide">
-        <div id="banner" v-if="show">
-            <div>You {{gameWon ? "won" : "lost"}}!</div>
-            <button @click="playAgainClick">Play again?</button>
+        <div class="banner" v-if="show">
+            <div>
+                <WinLossSVG :gameWon="gameWon" v-on:playAgainClick="playAgainClick" v-on:statusClick="() => {}"/>
+            </div>
         </div>
     </transition>
 </template>
 
 <script>
+import WinLossSVG from "@/components/WinLossSVG.vue";
+
 export default {
     name: "PlayAgainBanner",
     props: {
@@ -16,10 +19,12 @@ export default {
         playAgain: Function,
         show: Boolean
     },
+    components:{
+        WinLossSVG
+    },
     methods: {
         playAgainClick() {
-            console.log("button clicked")
-            this.$emit('playAgain');
+            this.$emit('playAgainClick');
             // trigger transition out
         }
     },
@@ -33,28 +38,48 @@ export default {
     --height: 50px;
 }
 
+@keyframes enter {
+    from {
+        transform: translateX(300vw);
+    }
+    to {
+        transform: translateX(0vw);
+    }
+}
+@keyframes exit {
+    from {
+        transform: translateX(0vw);
+    }
+    to {
+        transform: translateX(-200vw);
+    }
+}
+
 .slide-enter-active,
 .slide-leave-active {
-  margin-right: 0;
-  transition: all 420ms ease;
+    animation: enter;
 }
 .slide-enter-from,
 .slide-leave-to {
-  margin-right: -25vw;
-  transition: all 420ms ease;
+    animation-name: exit;
 }
 
 
 
-#banner{
-    width: 100vw;
+.banner{
+    width: 300vw;
     height: var(--height);
-    background: #00000040;
+    /*background: #00000040;*/
+    background: linear-gradient(90deg, #00000000 0%, #00000060 33%, #00008055 66%, #00000000 100%);
     position: absolute;
     top: calc(50vh - var(--height) / 2);
+    right: -100vw; 
+    
+
+    animation-duration: 400ms;
+    animation-iteration-count: 1;
 
     display: flex;
-    flex-direction: column;
     justify-content: center;
 
 }

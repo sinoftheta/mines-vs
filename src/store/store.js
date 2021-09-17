@@ -36,10 +36,11 @@ const store = new Vuex.Store({
         peerId: 1,
         seed: 69,
         ...difficulty.expert,
-        mode: 'expert' // beginner | intermediate | expert | custom 
+        mode: 'expert', // beginner | intermediate | expert | custom 
+        autoPlay: true,
     }),
-    actions: {
-        init({_state, commit}){
+    actions: { 
+        init({_state, commit}){ // eslint-disable-line
             // get jwt from url params
             //commit('setJwt', jwt)
             /*
@@ -54,6 +55,7 @@ const store = new Vuex.Store({
         //setGroup(state, group){Vue.set(state, 'group', group);}
         userId(state, id){Vue.set(state, 'userId', id)},
         peerId(state, id){Vue.set(state, 'peerId', id)},
+        autoPlay(state, val){Vue.set(state, 'autoPlay', val)},
         height(state, h ){Vue.set(state, 'height', h ); Vue.set(state, 'mode', 'custom' );},
         width (state, w ){Vue.set(state, 'width' , w ); Vue.set(state, 'mode', 'custom' );},
         mines (state, m) {Vue.set(state, 'mines' , m ); Vue.set(state, 'mode', 'custom' );},

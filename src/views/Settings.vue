@@ -17,6 +17,9 @@
         
         <input type="checkbox" id="expert" v-model="expert">
         <label for="expert">expert</label>
+        <br>
+        <input type="checkbox" id="autoPlay" v-model="autoPlay">
+        <label for="autoPlay">autoplay</label>
         
     </div>
 </template>
@@ -28,29 +31,33 @@ export default {
     computed: {
         mines:{
             get(){return this.$store.state.mines;},
-            set(v){this.$store.commit('mines', v)},
+            set(v){this.$store.commit('mines', v);},
         },
         height:{
             get(){return this.$store.state.height;},
-            set(v){this.$store.commit('height', v)},
+            set(v){this.$store.commit('height', v);},
         },
         width:{
             get(){return this.$store.state.width;},
-            set(v){this.$store.commit('width', v)},
+            set(v){this.$store.commit('width', v);},
         },
         // beginner | intermediate | expert | custom 
         beginner:{
             get(){return this.$store.state.mode === 'beginner';},
-            set(){this.$store.commit('mode', 'beginner')},
+            set(){this.$store.commit('mode', 'beginner');},
         },
         intermediate:{
             get(){return this.$store.state.mode === 'intermediate';},
-            set(){this.$store.commit('mode', 'intermediate')},
+            set(){this.$store.commit('mode', 'intermediate');},
         },
         expert:{
             get(){return this.$store.state.mode === 'expert';},
-            set(){this.$store.commit('mode', 'expert')},
+            set(){this.$store.commit('mode', 'expert');},
         },
+        autoPlay:{
+            get(){return this.$store.state.autoPlay;},
+            set(v){this.$store.commit('autoPlay', v);},
+        }
 
     },
     methods: {
