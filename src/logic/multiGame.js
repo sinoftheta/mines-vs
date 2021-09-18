@@ -15,9 +15,9 @@ import {p1, p2} from '@/logic/const.js';
 
 /**
  * TERMINOLOGY:
- * user = host = p1
+ * user = client = p1
  * 
- * opponent = client = p2
+ * opponent = host = p2
  * 
  * all operations are communitive, meaning the order in which they are applied to the board does not matter
  * both player states will resolve to the same final state as long as all inputs are received by both players.
@@ -103,22 +103,31 @@ export default class MultiGame{
 
         // Handle incoming data connection
         this.peer.on('connection', (conn) => {
-            // start connection as client
+            // start connection as host
 
-            console.log('incoming peer connection, you are client!');
+            console.log('incoming peer connection, you are host!');
             this.conn = conn;
-            this.host = false;
+            this.host = true;
             this.player = p2;
             this.opponent = p1;
-            this.conn.on('open', () => { 
-                console.log('sending handshake'); 
-                this.conn.send({type: handshake}); // should also send game settings
+            this.conn.on('open', () => {
+                
+                console.log('sending settings to client'); 
+
+                this.seed = Math.floor(Math.random() * 9007199254740991);
+                this.conn.send({
+                    type: settings,
+                    seed: this.seed,
+                    height: this.height,
+                    width: this.width,
+                    mines: this.mines
+                });
 
                 // TODO: make pinging a debug option... tbh its kinda useless. maybe make it better somehow?
                 // start pinging
                 // this.handlePing(); 
             });
-            this.conn.on('data', (data) => this.clientSwitch(data));
+            this.conn.on('data', (data) => this.hostSwitch(data));
         });
 
         // use opponent code if supplied
@@ -129,27 +138,20 @@ export default class MultiGame{
         console.log('setting opponent code:', code);
         // start connection as host
         this.connectId = code;
-        this.host = true;
+        this.host = false;
         this.player = p1; 
         this.opponent = p2;
-        console.log(`Connecting to ${code}... you are host!`); 
+        console.log(`Connecting to ${code}... you are client!`); 
         this.conn = this.peer.connect(code);
         //this.conn.on('open', () => {});
 
-        this.conn.on('data', (data) => this.hostSwitch(data));
+        this.conn.on('data', (data) => this.clientSwitch(data));
     }
     hostSwitch(data){
         switch(data.type){
-            case handshake:
+            case settings:
                 //init seed (& other settings)
-                this.seed = Math.floor(Math.random() * 9007199254740991);
-                this.conn.send({
-                    type: settings,
-                    seed: this.seed,
-                    height: this.height,
-                    width: this.width,
-                    mines: this.mines
-                });
+                console.log("host receiving settings")
                 break;
             case standby:
                 this.hostReady = false;
@@ -172,7 +174,6 @@ export default class MultiGame{
             case ping:
                 this.handlePing();
                 break;
-
         }
     }
     clientSwitch(data){ // break into init sequence & gameplay switches?
