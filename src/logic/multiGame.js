@@ -112,7 +112,7 @@ export default class MultiGame{
             this.opponent = p1;
             this.conn.on('open', () => { 
                 console.log('sending handshake'); 
-                this.conn.send({type: handshake});
+                this.conn.send({type: handshake}); // should also send game settings
 
                 // TODO: make pinging a debug option... tbh its kinda useless. maybe make it better somehow?
                 // start pinging
