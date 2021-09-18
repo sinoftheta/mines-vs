@@ -41,15 +41,25 @@ const pingInterval = 1000; // ms
 const countdownTime = 100; // ms
 
 export default class MultiGame{
+    /**
+     * @param {Element}  boardRef a reference to an html canvas that the board will be rendered on
+     * @param {Number}   height height of the board
+     * @param {Number}   width width of the board
+     * @param {Number}   mines nimber of mines to be placed on the board
+     * @param {Number}   px size of game tiles in pixels
+     * @param {Function} onIdGenerate callback that is passed the clients id when it is received from the peerjs server
+     * @param {Function} startCountDownUI callback returns a promise after countdown has started (???)
+     * @param {String}   opponentConnectCode, // optional, client will automatically connect to this code if it is provided
+     */
     constructor(
         boardRef, 
         height, 
         width, 
         mines,
         px,
-        onIdGenerate, //callback to display users connect code once it has been generated
-        startCountDownUI, // returns a promise after countdown has started
-        opponentConnectCode, // used when client is given a challenge link with an opponent connect code already created
+        onIdGenerate,
+        startCountDownUI,
+        opponentConnectCode, 
         ){
 
         // save stuff
@@ -176,7 +186,7 @@ export default class MultiGame{
                 break;
         }
     }
-    clientSwitch(data){ // break into init sequence & gameplay switches?
+    clientSwitch(data){
         switch(data.type){
             case settings:
                 //sync states
@@ -355,6 +365,8 @@ export default class MultiGame{
         }
     }
     opponentChord(list){
+        // BUG: need to resolve opponents chord as well...?
+
         console.log('opponent chording!', list);
         list.forEach(({x,y}) => this.opponentLeftClick(x,y));
     }
@@ -435,7 +447,7 @@ export default class MultiGame{
 // create a dictionary with x,y as the key, and the timestamp & owner & point value of click as the value
 /*
 let hub = {
-    _1_2: {ts: 123, owner: 'host', points: 12}
+    _1_2: {ts: 123, owner: p1, points: 12}
 }
 * *idea could be used in future
 */

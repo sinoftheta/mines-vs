@@ -2,6 +2,16 @@
 import {p1,p2, none, leftMouse, rightMouse, middleMouse} from '@/logic/const.js';
 
 export default class MouseHandler{
+    /**
+     * 
+     * @param {Element} canvasRef a reference to an html canvas that the board will be rendered on
+     * @param {Object} gameState a reference to the gamestate object
+     * @param {Object} boardRender a reference to the board render manager object
+     * @param {Function} submitClick 
+     * @param {Function} submitFlag 
+     * @param {Function} submitChord 
+     * @param {Function} _debugForceClick 
+     */
     constructor(canvasRef, gameState, boardRender, submitClick, submitFlag, submitChord, _debugForceClick){
         this.canvas = canvasRef;
         this.state = gameState;
@@ -91,6 +101,8 @@ export default class MouseHandler{
         }
     }
     recordButtonsPressed(buttons){
+        // if (buttons & leftMouse & rightMouse) this.curButton = middleMouse
+        // else if      (buttons & leftMouse)   this.curButton = leftMouse;
         if      (buttons & leftMouse)   this.curButton = leftMouse;
         else if (buttons & rightMouse)  this.curButton = rightMouse;
         else if (buttons & middleMouse) this.curButton = middleMouse;
