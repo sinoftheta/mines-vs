@@ -1,7 +1,7 @@
 // multiplayer minesweeper board state
 import seedrandom from 'seedrandom';
 import Tile from '@/logic/tile.js';
-import {p1,p2} from '@/logic/const.js';
+import {p1,p2, neither} from '@/logic/const.js';
 
 
 // for debugging https://nielsleenheer.com/articles/2017/the-case-for-console-hex/
@@ -195,7 +195,7 @@ export default class State{
             // 1. get island id associated with {x,y}
             // 2. get origin click associated with any tile with that island id
             
-            const origin = originTile.origin;
+            // const origin = originTile.origin;
             let points = 0;
             // 3. reclaim all tiles (and their points) with the same origin click
             for(let i = 0; i < this.width; ++i){  
@@ -315,6 +315,25 @@ export default class State{
     get clear(){
         // area - uncovered == mines
         return (this.height * this.width) - this.uncoveredSafeTiles === this.mines;
+    }
+
+    /**
+     * Analyze the current state and return the winner (p1,p2,neither)
+     * winning heuristic of board state
+     */
+    get winnerByArea(){
+        // count number of tiles owned by each player
+        let count = 0;
+
+        for(let i = 0; i < this.width; ++i){
+            for(let j = 0; j < this.height; ++j){
+                if      (this.board[i][j].owner == p1) count += 1;
+                else if (this.board[i][j].owner == p2) count -= 1;
+            }
+        }
+        if(count == 0) return neither;
+        if(count > 0)  return p1;
+        if(count < 0)  return p1;
     }
 
     /*

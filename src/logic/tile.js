@@ -1,5 +1,5 @@
 
-import {p1,p2} from '@/logic/const.js';
+import {p1,p2, neither} from '@/logic/const.js';
 const value    = 0b00001111; // bits 0 - 3
 const revealed = 0b00010000; // bit 4. 8 = 2^3
 const isMine   = 0b00100000; // bit 5
@@ -19,8 +19,8 @@ export default class Tile{
         this.checked  = false;
         this.origin   = {x: null, y: null};
         this.islandId = 0;
-        this.owner    = null; // which player owns the tile
-        this.ppp      = null;   // player point priority 
+        this.owner    = neither; // which player owns the tile
+        this.ppp      = neither;   // player point priority 
 
     }
     // these work but need to be redone

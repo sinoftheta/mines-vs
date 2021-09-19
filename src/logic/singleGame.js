@@ -6,6 +6,7 @@ import {p1} from '@/logic/const.js'; // for debugging purposes - multiplayer fea
 
 export default class SingleGame{
     /**
+     * Manager class for a single player game
      * @param {Element}  boardRef a reference to an html canvas that the board will be rendered on
      * @param {Number}   height height of the board
      * @param {Number}   width width of the board

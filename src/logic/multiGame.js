@@ -15,18 +15,17 @@ import {p1, p2} from '@/logic/const.js';
 
 /**
  * TERMINOLOGY:
- * user = client = p1
+ * user = client = p2
  * 
- * opponent = host = p2
+ * opponent = host = p1
  * 
  * all operations are communitive, meaning the order in which they are applied to the board does not matter
  * both player states will resolve to the same final state as long as all inputs are received by both players.
  * 
- * this is a bit of a god class...
+ * is this turning into a god class?
  */
 
 // transmission types:
-const handshake = 'handshake'; //connection established
 const settings = 'settings';  //settings transmitted
 const standby = 'standby'; // waiting for players to be ready
 const start = 'start'; //signal countdown timer to begin
@@ -42,6 +41,7 @@ const countdownTime = 100; // ms
 
 export default class MultiGame{
     /**
+     * Manager class for a versus game (both players compete on the same board)
      * @param {Element}  boardRef a reference to an html canvas that the board will be rendered on
      * @param {Number}   height height of the board
      * @param {Number}   width width of the board
@@ -50,6 +50,7 @@ export default class MultiGame{
      * @param {Function} onIdGenerate callback that is passed the clients id when it is received from the peerjs server
      * @param {Function} startCountDownUI callback returns a promise after countdown has started (???)
      * @param {String}   opponentConnectCode, // optional, client will automatically connect to this code if it is provided
+     * @param {Function} onEnd onEnd(Boolean win) callback that is executed when the game is finished
      */
     constructor(
         boardRef, 
@@ -118,8 +119,8 @@ export default class MultiGame{
             console.log('incoming peer connection, you are host!');
             this.conn = conn;
             this.host = true;
-            this.player = p2;
-            this.opponent = p1;
+            this.player = p1;
+            this.opponent = p2;
             this.conn.on('open', () => {
                 
                 console.log('sending settings to client'); 
@@ -149,8 +150,8 @@ export default class MultiGame{
         // start connection as host
         this.connectId = code;
         this.host = false;
-        this.player = p1; 
-        this.opponent = p2;
+        this.player = p2; 
+        this.opponent = p1;
         console.log(`Connecting to ${code}... you are client!`); 
         this.conn = this.peer.connect(code);
         //this.conn.on('open', () => {});
@@ -281,11 +282,7 @@ export default class MultiGame{
 
         console.log(`you scored: ${points}, your total: ${this.userPoints += points}`);
 
-        if(this.state.clear){
-            // game won
-            console.log('game over!');
-            return;
-        }
+        this.checkForWinner();
     }
     opponentLeftClick(x,y){
         // before the game starts, each tile will be randomly assigned a "player point priority." 
@@ -306,10 +303,23 @@ export default class MultiGame{
         this.render.drawAll();
         this.render.highlight(this.mouseHandler.curX, this.mouseHandler.curY);
 
+        this.checkForWinner();
+
+    }
+    checkForWinner(){
+        // check win condition
         if(this.state.clear){
-            // game won
-            console.log('game over!');
-            return;
+            const winner = this.state.winnerByArea;
+
+            if(winner == this.player){
+                console.log("you won!");
+            }
+            else if(winner == this.opponent){
+                console.log("you lost!");
+            }
+            else {
+                console.log("its a tie!");
+            }
         }
     }
 
