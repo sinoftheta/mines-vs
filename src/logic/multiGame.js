@@ -290,8 +290,8 @@ export default class MultiGame{
     opponentLeftClick(x,y){
         // before the game starts, each tile will be randomly assigned a "player point priority." 
         // This value will determine the ownership of a click in the event of a tie.
-        // if we receive an opponent click that has already been executed on the board, we look to the "player point priority" value
-        // of the tile
+        // if we receive an opponent click on a tile that has already been uncovered on the board, we look to the "player point priority" value
+        // of the tile to determine which player should own the tile
 
         const target = this.state.board[x][y];
         // if tile is revealed, look to the player point priority of the tile to determine if the opponent gets the tile, or if the click is ignored by the client
@@ -379,11 +379,12 @@ export default class MultiGame{
      */
     resolveChord(i,j, owner){
         let points = 0;
-
-        const choordTarg = this.state.board[i][j];
-        if(!choordTarg.revealed || choordTarg.isMine) return;
         let revealList = [];
         let neighborFlagCount = 0;
+
+        const choordTarg = this.state.board[i][j];
+        if(!choordTarg.revealed || choordTarg.isMine) return {points, revealList};
+
 
         // count neighboring flags and save potential tile coordinates to reveal 
         this.state.neighbors(i,j).forEach( ({x,y}) => {
@@ -402,7 +403,12 @@ export default class MultiGame{
                 points += this.state.revealPoints(x,y, owner, i,j);
             });
         }
+        else { // update reveal list to account for no tiles being revealed
+            console.log("chord did not resolve!");
+            revealList = [];
+        }
 
+        
         return {points, revealList};
     }
     /**

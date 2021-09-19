@@ -100,10 +100,10 @@ export default class MouseHandler{
             default:
         }
     }
+    // maps buttons byte to game inputs
     recordButtonsPressed(buttons){
-        // if (buttons & leftMouse & rightMouse) this.curButton = middleMouse
-        // else if      (buttons & leftMouse)   this.curButton = leftMouse;
-        if      (buttons & leftMouse)   this.curButton = leftMouse;
+        if      (buttons == (leftMouse | rightMouse)) this.curButton = middleMouse
+        else if (buttons & leftMouse)   this.curButton = leftMouse;
         else if (buttons & rightMouse)  this.curButton = rightMouse;
         else if (buttons & middleMouse) this.curButton = middleMouse;
         else                            this.curButton = none;
