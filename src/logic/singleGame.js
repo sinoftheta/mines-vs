@@ -13,6 +13,7 @@ export default class SingleGame{
      * @param {Number}   mines nimber of mines to be placed on the board
      * @param {Number}   px size of game tiles in pixels
      * @param {Function} onEnd onEnd(Boolean win) callback that is executed when the game is finished
+     * @param {Function} onMinesRemainingUpdate callback for when remainingMines value changes
      */
     constructor(
         boardRef, 
@@ -20,7 +21,8 @@ export default class SingleGame{
         width, 
         mines,
         px,
-        onEnd
+        onEnd,
+        onMinesRemainingUpdate
         ){
         // save stuff
         this.height = height;
@@ -28,6 +30,9 @@ export default class SingleGame{
         this.mines = mines;
         this.renderRef = boardRef;
         this.px = px;
+        this.points = 0;
+        this.remainingMines = mines;
+        this.firstClick = true;
         this.state  = new State(height, width, mines, Math.random(), true);
         this.render = new BoardRender(
             boardRef, 
@@ -44,9 +49,10 @@ export default class SingleGame{
             (x,y) => {      this.flag(x,y);},
             (x,y) => {     this.chord(x,y);}
         );
-        this.firstClick = true;
+        
         this.onEnd = (win) => { onEnd(win); };
-        this.points = 0;
+        this.onMinesRemainingUpdate = (mines) => {onMinesRemainingUpdate(mines)};
+
     }
     leftClick(x,y){
 
@@ -82,10 +88,14 @@ export default class SingleGame{
             return;
         }
     }
-    flag(x,y){
+    flag(x,y){ // consider putting this in state?
         const target = this.state.board[x][y];
         if(!target.revealed){
             target.flagged = !target.flagged;
+
+            if(target.flagged)  this.remainingMines -= 1;
+            if(!target.flagged) this.remainingMines += 1;
+            this.onMinesRemainingUpdate(this.remainingMines);
         }
     }
     chord(i,j){

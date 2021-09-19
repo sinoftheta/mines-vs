@@ -2,7 +2,7 @@
     <div>
         <div>Solo</div>
         <canvas ref="boardCanvas"></canvas>
-        <div>remaining: {{minesRemaining}}</div>
+        <div>remaining: {{remainingMines}}</div>
         <PlayAgainBanner v-on:playAgainClick="playAgainClick" :show="showPlayAgainBanner" :gameWon="gameWon"/>
     </div>
 </template>
@@ -19,7 +19,7 @@ export default {
     data: function () {
         this.game = null; // important https://stackoverflow.com/questions/68602389/maximum-call-stack-error-when-attempting-to-update-chart-in-vue-js
         return {
-            minesRemaining: this.$store.state.mines,
+            remainingMines: this.$store.state.mines,
             showPlayAgainBanner: false,
             gameWon: false,
         };
@@ -42,10 +42,14 @@ export default {
                 this.$store.state.width,
                 this.$store.state.mines,
                 35,
-                this.onEnd
+                this.onEnd,
+                this.updateRemainingMines
             );
             this.showPlayAgainBanner = false;
             clearTimeout(this.autoPlayTimer);
+        },
+        updateRemainingMines(mines){
+            this.remainingMines = mines;
         }
     },
     mounted(){
