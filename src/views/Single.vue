@@ -46,7 +46,11 @@ export default {
                 this.updateRemainingMines
             );
             this.showPlayAgainBanner = false;
-            clearTimeout(this.autoPlayTimer);
+            this.updateRemainingMines(this.$store.state.mines); // reset remaining mines 
+
+            clearTimeout(this.autoPlayTimer); // clear timeout in case play again button is pressed while autoplay is on
+
+            
         },
         updateRemainingMines(mines){
             this.remainingMines = mines;

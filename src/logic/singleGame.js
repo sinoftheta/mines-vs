@@ -50,7 +50,7 @@ export default class SingleGame{
             (x,y) => {     this.chord(x,y);}
         );
         
-        this.onEnd = (win) => { onEnd(win); };
+        this.onEnd = (winStatus) => { onEnd(winStatus); };
         this.onMinesRemainingUpdate = (mines) => {onMinesRemainingUpdate(mines)};
 
     }
