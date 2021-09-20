@@ -5,7 +5,7 @@ import State from '@/logic/state';
 import BoardRender from '@/logic/boardRender';
 import MouseHandler from '@/logic/mouseHandler';
 import Peer from 'peerjs';
-import {p1, p2} from '@/logic/const.js';
+import {p1, p2, neither} from '@/logic/const.js';
 
 //https://glitch.com/edit/#!/peerjs-video?path=public%2Fmain.js%3A1%3A0
 // NOT WORKING ON LOCAL NETWORK FIX
@@ -29,7 +29,7 @@ import {p1, p2} from '@/logic/const.js';
 const settings = 'settings';  //settings transmitted
 const standby = 'standby'; // waiting for players to be ready
 const start = 'start'; //signal countdown timer to begin
-const restart = 'restart';
+const readyNext = 'readyNext';
 //=-=-=-=-=-=-=-=-//
 const leftClick = 'lclick';
 const flag = 'flag';
@@ -85,6 +85,7 @@ export default class MultiGame{
 
         this.userPoints = 0;
         this.opponentPoints = 0;
+        this.opponentReadyNext = false;
         this.xInit = 0;
         this.yInit = 0;
 
@@ -113,7 +114,7 @@ export default class MultiGame{
         });
 
         // Handle incoming data connection
-        this.peer.on('connection', (conn) => {
+        this.peer.on('connection', (conn) => { // a bit of callback hell, refactor might be nice
             // start connection as host
 
             console.log('incoming peer connection, you are host!');
@@ -160,13 +161,7 @@ export default class MultiGame{
     }
     hostSwitch(data){
         switch(data.type){
-            case settings:
-                //init seed (& other settings)
-                console.log("host receiving settings")
-                break;
             case standby:
-                this.hostReady = false;
-                this.clientReady = false;
                 this.setBoardSync();
                 this.conn.send({type: start});
                 this.startCountDownUI(countdownTime);
@@ -185,6 +180,12 @@ export default class MultiGame{
             case ping:
                 this.handlePing();
                 break;
+            case readyNext:
+                this.opponentReadyNext = true;
+                if(this.playerReadyNext){
+                    // startGame with new seed
+                }
+
         }
     }
     clientSwitch(data){
@@ -199,7 +200,7 @@ export default class MultiGame{
                 this.conn.send({type: standby});
                 break;
             case start:
-                const adjustedCountTime = countdownTime; // - prevrtt / 2 
+                const adjustedCountTime = countdownTime; // should be this but subtract the previous rtt/2
                 this.startCountDownUI(adjustedCountTime);
                 this.multiplayerInit();
                 setTimeout(() => {this.startGame();}, adjustedCountTime);
@@ -216,6 +217,16 @@ export default class MultiGame{
             case ping:
                 this.handlePing();
                 break;
+            case readyNext:
+                this.opponentReadyNext = true;
+                this.seed = data.seed;
+
+                if(this.playerReadyNext){
+                    this.setBoardSync();
+                    this.conn.send({type: standby});
+                    // else this will need to be done in the client ready function
+                }
+                
 
         }
     }
@@ -252,9 +263,10 @@ export default class MultiGame{
         console.log('go!');
         this.gameStartTime = Date.now();
         this.gameActive = true;
+        this.opponentReadyNext = false;
 
         // reveal inital zero, do not award points or owner
-        this.state.revealPoints(this.xInit, this.yInit, '', this.xInit, this.yInit);
+        this.state.revealPoints(this.xInit, this.yInit, neither, this.xInit, this.yInit);
         this.render.drawAll();
     }
     multiplayerInit(){
