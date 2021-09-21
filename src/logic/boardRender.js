@@ -58,20 +58,25 @@ export default class BoardRender{
         
         
     }
+    /*
+    Out Of Bounds
+    returns true if (x,y) is within the board.
+    */
     oob(x,y){ 
         return x >= this.state.width || x < 0 || y >= this.state.height || y < 0;  
     }
-    checker(a,b){
-        return (a % 2 == 0) != (b % 2 == 0);
+    /*
+    checker pattern
+    returns true if the (x,y) pair should be highlighted to create a checkerboard pattern.
+    */
+    checker(x,y){
+        return (x % 2 == 0) != (y % 2 == 0);
     }
     drawAll(){
         // const start = Date.now();
-        const ctx = this.ctx;
-        const state = this.state;
-        const px = this.px;
 
-        for(let i = 0; i < state.width; ++i){
-            for(let j = 0; j < state.height; ++j){
+        for(let i = 0; i < this.state.width; ++i){
+            for(let j = 0; j < this.state.height; ++j){
                 this.drawTileState(i,j);
             }
         }
@@ -288,7 +293,7 @@ export default class BoardRender{
 
         for(let i = 0; i < state.width; ++i){
             for(let j = 0; j < state.height; ++j){
-                const light = xor( i % 2 == 0, j % 2 == 0);
+                const light = this.checker(i,j);
                 const target = this.state.board[i][j];
                 if(target.ppp == player){
                     this.ctx.fillStyle = light ? theme.p1Background1 : theme.p1Background2;
@@ -298,7 +303,7 @@ export default class BoardRender{
                 }
                 ctx.strokeStyle = ctx.fillStyle;
                 ctx.beginPath();
-                ctx.rect(i * this.px, j * this.px, this.px, this.px);
+                ctx.rect(i * px, j * px, px, px);
                 ctx.fill();
                 ctx.stroke();
 

@@ -37,7 +37,6 @@ const chord = 'chord';
 const ping = 'ping';
 
 const pingInterval = 1000; // ms
-const countdownTime = 100; // ms
 
 export default class MultiGame{
     /**
@@ -48,9 +47,9 @@ export default class MultiGame{
      * @param {Number}   mines nimber of mines to be placed on the board
      * @param {Number}   px size of game tiles in pixels
      * @param {Function} onIdGenerate callback that is passed the clients id when it is received from the peerjs server
-     * @param {Function} startCountDownUI callback returns a promise after countdown has started (???)
-     * @param {String}   opponentConnectCode, // optional, client will automatically connect to this code if it is provided
-     * @param {Function} onEnd onEnd(Boolean win) callback that is executed when the game is finished
+     * @param {Function} startCountDownUI callback that starts the countdown UI animation
+     * @param {Number}   countdownTime // countdown time (in ms) between connection and game start
+     * @param {Function} promptPlayAgain(Boolean win) callback that is executed when the game is finished
      */
     constructor(
         boardRef, 
@@ -60,7 +59,8 @@ export default class MultiGame{
         px,
         onIdGenerate,
         startCountDownUI,
-        opponentConnectCode, 
+        countdownTime,
+        promptPlayAgain,
         ){
 
         // save stuff
@@ -80,8 +80,9 @@ export default class MultiGame{
             () => {},
         );
 
-        //this.onIdGenerate = onIdGenerate;
+        //this.onIdGenerate = onIdGenerate; // dont need to save this function as it is used in a lambda with onIdGenerate in scope anyway
         this.startCountDownUI = startCountDownUI;
+        this.countdownTime = countdownTime;
 
         this.userPoints = 0;
         this.opponentPoints = 0;
@@ -143,7 +144,7 @@ export default class MultiGame{
         });
 
         // use opponent code if supplied
-        if(opponentConnectCode) this.opponentCode = opponentConnectCode;
+        //if(opponentConnectCode) this.opponentCode = opponentConnectCode;
     }
     set opponentCode(code){
 
@@ -164,9 +165,10 @@ export default class MultiGame{
             case standby:
                 this.setBoardSync();
                 this.conn.send({type: start});
-                this.startCountDownUI(countdownTime);
+                // ***needs refactor with promise*** 
+                this.startCountDownUI(this.countdownTime);
                 this.multiplayerInit();
-                setTimeout(() => {this.startGame();}, countdownTime);
+                setTimeout(() => {this.startGame();}, this.countdownTime);
                 break;
             case leftClick:
                 this.opponentLeftClick(data.x, data.y);
@@ -200,7 +202,8 @@ export default class MultiGame{
                 this.conn.send({type: standby});
                 break;
             case start:
-                const adjustedCountTime = countdownTime; // should be this but subtract the previous rtt/2
+                const adjustedCountTime = this.countdownTime; // should be this but subtract the previous rtt/2
+                // ***needs refactor with promise*** 
                 this.startCountDownUI(adjustedCountTime);
                 this.multiplayerInit();
                 setTimeout(() => {this.startGame();}, adjustedCountTime);
@@ -221,13 +224,20 @@ export default class MultiGame{
                 this.opponentReadyNext = true;
                 this.seed = data.seed;
 
-                if(this.playerReadyNext){
-                    this.setBoardSync();
-                    this.conn.send({type: standby});
-                    // else this will need to be done in the client ready function
-                }
+                this.clientAttemptStart();
                 
 
+        }
+    }
+    clientReady(){
+        this.playerReadyNext = true;
+        this.conn.send({type: readyNext});
+        this.clientAttemptStart();
+    }
+    clientAttemptStart(){
+        if(this.playerReadyNext && this.opponentReadyNext){
+            this.setBoardSync();
+            this.conn.send({type: standby});
         }
     }
     handlePing(){
@@ -332,8 +342,14 @@ export default class MultiGame{
             else {
                 console.log("its a tie!");
             }
+
+
+            // prompt for play again
+
+
         }
     }
+
 
     userFlag(x,y){
         console.log('user flagging')

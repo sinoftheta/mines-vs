@@ -1,10 +1,12 @@
 <template>
     <div>
         <div>versus</div>
+        <canvas ref="boardCanvas"></canvas>
         <!--div>{{userScore}}</div>
         <div>{{opponentScore}}</div>
         <div>{{minesRemaining}}</div-->
-        <canvas ref="boardCanvas"></canvas>
+        <CountDownGraphic :animationTime="cdAnimationTime" v-if="showCountDown"/>
+
         <div>
             <div>your connect code</div>
             <input type="text" v-model="userConnectCode">
@@ -21,16 +23,6 @@
                 </svg>
             </button>
         </div>
-        <!--div>
-            <div>challenge link</div>
-            <input type="text" :value="challengeUrl()">
-            <button type="button" @click="copyChallengeLink"> {{copyStatus}} 
-                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-clipboard" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
-                    <path fill-rule="evenodd" d="M9.5 1h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
-                </svg>
-            </button>
-        </div-->
         <div>
             <div>opponent connect code</div>
             <input 
@@ -45,6 +37,7 @@
 
 <script>
 import MultiGame from '@/logic/multiGame.js';
+import CountDownGraphic from '@/components/CountDownGraphic.vue';
 
 export default {
     name: 'Vs',
@@ -56,8 +49,13 @@ export default {
             opponentConnectCode: '',
             userScore: 0,
             opponentScore: 0,
-            minesRemaining: 0
+            minesRemaining: 0,
+            cdAnimationTime: 2000,
+            showCountDown: false,
         }
+    },
+    components: {
+        CountDownGraphic
     },
     methods:{
         setUserConnectCode(code){
@@ -73,9 +71,15 @@ export default {
             this.$copyText(this.challengeUrl());
         },
         setOpponentCode(e){this.game.opponentCode = e.target.value;},
+
+        // ***needs refactor with promise*** 
         startCountDown(time){
-            //spawn count down modal
             console.log('counting down:', time);
+
+            //spawn count down modal
+            this.showCountDown = true;
+            setTimeout(() => {this.showCountDown = false}, time);
+            
         },
         challengeUrl(){ // maybe shoul be a computed
             return window.location.href.split('#')[0] + '#/vs?challenge=' + this.userConnectCode;
@@ -103,7 +107,8 @@ export default {
             this.$store.state.mines,
             35,
             this.onCodeGenerate,
-            this.startCountDown
+            this.startCountDown,
+            this.cdAnimationTime,
             );
 
 
