@@ -50,8 +50,8 @@ export default {
             userScore: 0,
             opponentScore: 0,
             minesRemaining: 0,
-            cdAnimationTime: 2000,
-            showCountDown: false,
+            cdAnimationTime: 2300,
+            showCountDown: true,
         }
     },
     components: {

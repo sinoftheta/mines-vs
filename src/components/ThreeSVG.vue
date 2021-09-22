@@ -1,7 +1,7 @@
 <template>
     <!-- Generator: Adobe Illustrator 23.0.1, SVG Export Plug-In  -->
     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-        width="458.33px" height="375.82px" viewBox="0 0 458.33 375.82" style="enable-background:new 0 0 458.33 375.82;"
+        width="458.33px" height="375.82px" viewBox="0 0 458.33 375.82" style="enable-background:new 0 0 458.33 375.82; height:100%; width:100%;"
         xml:space="preserve">
         <g>
             <path d="M423.02,109.16l-7.17,26.25c-9.39,35-22.95,52.51-40.66,52.51c17.71,0,21.79,17.5,12.22,52.5l-7.17,26.26
@@ -157,9 +157,6 @@
     }
 }
 
-.number{
-
-}
 
 
 </style>
