@@ -4,29 +4,29 @@
         width="448.57px" height="375.82px" viewBox="0 0 448.57 375.82" style="enable-background:new 0 0 448.57 375.82; height:100%; width:100%;"
         xml:space="preserve">
 
-        <linearGradient id="fill-gradient"
+        <linearGradient id="fill-gradient-2"
                     spreadMethod="reflect"
                     gradientTransform="rotate(77)"
         >
-            <animate attributeName="x1" :dur="duration" from="69%" to="15%" repeatCount="indefinite" /> <!-- radius of the start circle of the radial gradient -->
-            <animate attributeName="x2"  :dur="duration" from="65%" to="1%" repeatCount="indefinite" /> <!-- radius of the end circle of the radial gradient -->
+            <animate attributeName="x1" :dur="duration" from="69%" to="15%" repeatCount="1" /> <!-- radius of the start circle of the radial gradient -->
+            <animate attributeName="x2"  :dur="duration" from="65%" to="1%" repeatCount="1" /> <!-- radius of the end circle of the radial gradient -->
             <stop offset="0%" >
-                <animate attributeName="stop-color" :dur="duration" values="#00eaff; #00ff44;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
+                <animate attributeName="stop-color" :dur="duration" values="#00eaff; #00ff44;" repeatCount="1" /> <!-- y coordinate of the start circle of the radial gradient -->
             </stop>
             <stop offset="100%" >
-                <animate attributeName="stop-color" :dur="duration" values="#aaffff; #20ffff;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
+                <animate attributeName="stop-color" :dur="duration" values="#aaffff; #20ffff;" repeatCount="1" /> <!-- y coordinate of the start circle of the radial gradient -->
             </stop>
 
         </linearGradient>
-        <linearGradient id="star-gradient" x1="0" x2="0" y1="1" y2="0">
+        <linearGradient id="star-gradient-2" x1="0" x2="0" y1="1" y2="0">
             <stop class="outline" offset="0%" />
             <stop class="outline" offset="100%" stop-opacity="0.5"/>
         </linearGradient>
         <g>
-            <path  fill="url(#fill-gradient)" d="M357.05,30.4H122.97L94.89,135.41h182.06l-6.76,26.25H166.15c-52.02,0-85.05,26.25-99.09,78.76L39.22,345.42
+            <path  fill="url(#fill-gradient-2)" d="M357.05,30.4H122.97L94.89,135.41h182.06l-6.76,26.25H166.15c-52.02,0-85.05,26.25-99.09,78.76L39.22,345.42
                 h312.11l27.83-105.01H197.1l7.02-26.25h104.04c52.01,0,84.95-26.25,98.83-78.76l7.02-26.25C428.06,56.65,409.07,30.4,357.05,30.4z"
                 />
-            <path class="st1" fill="url(#star-gradient)" d="M321.39,368.35l8.27-8.51c0.36-0.37,0.87-0.54,1.37-0.45l11.7,1.98c1.27,0.22,2.23-1.12,1.63-2.26l-5.54-10.49
+            <path class="st1" fill="url(#star-gradient-2)" d="M321.39,368.35l8.27-8.51c0.36-0.37,0.87-0.54,1.37-0.45l11.7,1.98c1.27,0.22,2.23-1.12,1.63-2.26l-5.54-10.49
                 c-0.24-0.45-0.24-0.99,0-1.45l5.5-10.52c0.6-1.14-0.37-2.47-1.64-2.25l-11.69,2.03c-0.5,0.09-1.02-0.08-1.38-0.44l-8.3-8.48
                 c-0.9-0.92-2.47-0.41-2.65,0.87l-1.68,11.75c-0.07,0.51-0.39,0.94-0.85,1.17l-10.63,5.27c-1.15,0.57-1.15,2.22,0.01,2.79
                 l10.65,5.23c0.46,0.23,0.78,0.66,0.85,1.17l1.73,11.74C318.93,368.76,320.5,369.27,321.39,368.35z M278.04,368.35l8.27-8.51
@@ -206,5 +206,5 @@
 
 </style>
 
-<script> export default { name: "TwoSVG", data(){return {duration: "1200ms"}} }
+<script> export default { name: "TwoSVG", data(){return {duration: "2000ms"}} } // duration has to line up with when the svg is visible (determined by CountDownGraphic animation)
 </script>

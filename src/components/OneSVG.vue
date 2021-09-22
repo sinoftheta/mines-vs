@@ -4,7 +4,7 @@
         width="295.01px" height="375.82px" viewBox="0 0 295.01 375.82" style="enable-background:new 0 0 295.01 375.82; height:100%; width: 100%;"
         xml:space="preserve">
         <!-- https://developer.mozilla.org/en-US/docs/Web/SVG/Element/radialGradient -->
-        <radialGradient id="fill-gradient"
+        <radialGradient id="fill-gradient-1"
                     spreadMethod="reflect"
         >
             <animate attributeName="fr" :dur="duration" from="15%" to="20%" repeatCount="indefinite" /> <!-- radius of the start circle of the radial gradient -->
@@ -21,14 +21,14 @@
             </stop>
 
         </radialGradient>
-        <linearGradient id="checker-gradient" x1="0" x2="0" y1="1" y2="0">
+        <linearGradient id="checker-gradient-1" x1="0" x2="0" y1="1" y2="0">
             <stop class="outline" offset="0%" />
             <stop class="outline" offset="100%" stop-opacity="0.5"/>
         </linearGradient>
         <g>
             <!-- polygon points="255.39,30.4 170.85,345.42 39.59,345.42 95.77,135.41 69.52,135.41 97.87,30.4 	"/ -->
-            <path fill="url(#fill-gradient)"     d="M97.87,30.4L69.52,135.41h26.25L39.59,345.42h131.26L255.39,30.4H97.87z"/>
-            <path fill="url(#checker-gradient)" d="M92.81,318.35H61.33v31.48h31.48V318.35z M155.77,318.35h-31.48v31.48h31.48V318.35z M61.33,286.87H29.86
+            <path fill="url(#fill-gradient-1)"     d="M97.87,30.4L69.52,135.41h26.25L39.59,345.42h131.26L255.39,30.4H97.87z"/>
+            <path fill="url(#checker-gradient-1)" d="M92.81,318.35H61.33v31.48h31.48V318.35z M155.77,318.35h-31.48v31.48h31.48V318.35z M61.33,286.87H29.86
                 v31.48h31.48V286.87z M92.81,255.39H61.33v31.48h31.48V255.39z M124.29,286.87H92.81v31.48h31.48V286.87z M155.77,255.39h-31.48
                 v31.48h31.48V255.39z M187.24,286.87h-31.48v31.48h31.48V286.87z M218.72,255.39h-31.48v31.48h31.48V255.39z M92.81,192.44H61.33
                 v31.48h31.48V192.44z M124.29,223.92H92.81v31.48h31.48V223.92z M155.77,192.44h-31.48v31.48h31.48V192.44z M187.24,223.92h-31.48

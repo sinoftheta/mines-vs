@@ -3,6 +3,24 @@
     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
         width="458.33px" height="375.82px" viewBox="0 0 458.33 375.82" style="enable-background:new 0 0 458.33 375.82; height:100%; width:100%;"
         xml:space="preserve">
+        <linearGradient id="fill-gradient-3"
+            spreadMethod="reflect"
+            gradientTransform="rotate(77)"
+        >
+            <animate attributeName="x1" :dur="duration" from="69%" to="15%" repeatCount="indefinite" /> <!-- radius of the start circle of the radial gradient -->
+            <animate attributeName="x2"  :dur="duration" from="65%" to="1%" repeatCount="indefinite" /> <!-- radius of the end circle of the radial gradient -->
+            <stop offset="0%" >
+                <animate attributeName="stop-color" :dur="duration" values="#00eaff; #00ff44;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
+            </stop>
+            <stop offset="100%" >
+                <animate attributeName="stop-color" :dur="duration" values="#aaffff; #20ffff;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
+            </stop>
+
+        </linearGradient>
+        <linearGradient id="circle-gradient-3" x1="0" x2="0" y1="1" y2="0">
+            <stop class="outline" offset="0%" />
+            <stop class="outline" offset="100%" stop-opacity="0.5"/>
+        </linearGradient>
         <g>
             <path d="M423.02,109.16l-7.17,26.25c-9.39,35-22.95,52.51-40.66,52.51c17.71,0,21.79,17.5,12.22,52.5l-7.17,26.26
                 c-14.18,52.5-47.84,78.76-100.98,78.76H40.08l28.43-105.01h186.03l7.17-26.26h-106.3l40.93-52.5h79.72l6.91-26.26H96.94
@@ -10,10 +28,6 @@
             <path class="st0" d="M364.82,30.39H125.64L96.94,135.4h186.03l-6.91,26.26h-79.72l-40.93,52.5h106.3l-7.17,26.26H68.51
                 L40.08,345.43h239.17c53.15,0,86.81-26.26,100.98-78.76l7.17-26.26c9.57-35,5.49-52.5-12.22-52.5c17.71,0,31.27-17.51,40.66-52.51
                 l7.17-26.25C437.37,56.65,417.97,30.39,364.82,30.39z"/>
-            <linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="212.199" y1="341.4856" x2="214.9006" y2="141.5637">
-                <stop  offset="0" style="stop-color:#000000"/>
-                <stop  offset="1" style="stop-color:#000000;stop-opacity:0"/>
-            </linearGradient>
             <path class="st1" d="M48.24,329.42c-6.13,0-11.09,4.91-11.09,10.96s4.97,10.96,11.09,10.96s11.09-4.91,11.09-10.96
                 S54.36,329.42,48.24,329.42z M74.47,329.42c-6.13,0-11.09,4.91-11.09,10.96s4.97,10.96,11.09,10.96s11.09-4.91,11.09-10.96
                 S80.6,329.42,74.47,329.42z M100.7,329.42c-6.13,0-11.09,4.91-11.09,10.96s4.97,10.96,11.09,10.96s11.09-4.91,11.09-10.96

@@ -1,13 +1,13 @@
 <template>
     <div>
-        <!-- div :style="`
+        <div :style="`
             animation-duration: ${ato3}ms;
             animation-delay: ${0}ms;
             `"
             class="banner-number"
         >
             <ThreeSVG/>
-        </div -->
+        </div>
         <div :style="`
             animation-duration: ${ato3}ms;
             animation-delay: ${ato3}ms;
@@ -16,7 +16,7 @@
         >
             <TwoSVG/>
         </div>
-        <!-- div :style="`
+        <div :style="`
             animation-duration: ${ato3}ms;
             animation-delay: ${2 * ato3}ms;
             `"
@@ -24,7 +24,7 @@
             @animationend="test"
         >
             <OneSVG/>
-        </div -->
+        </div>
     </div>
 </template>
 
@@ -75,8 +75,8 @@ export default {
     
     animation-iteration-count: 1;
 
-    /* animation-name: number-pan;
-    opacity: 0; */
+    animation-name: number-pan;
+    opacity: 0;
 }
 
 @keyframes number-pan{
