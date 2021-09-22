@@ -9,12 +9,12 @@
                     gradientTransform="rotate(77)"
         >
             <animate attributeName="x1" :dur="duration" from="69%" to="15%" repeatCount="indefinite" /> <!-- radius of the start circle of the radial gradient -->
-            <animate attributeName="x2"  :dur="duration" from="69%" to="2%" repeatCount="indefinite" /> <!-- radius of the end circle of the radial gradient -->
+            <animate attributeName="x2"  :dur="duration" from="65%" to="1%" repeatCount="indefinite" /> <!-- radius of the end circle of the radial gradient -->
             <stop offset="0%" >
-                <animate attributeName="stop-color" :dur="duration" values="#0fffe7; #0fffa3;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
+                <animate attributeName="stop-color" :dur="duration" values="#00eaff; #00ff44;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
             </stop>
             <stop offset="100%" >
-                <animate attributeName="stop-color" :dur="duration" values="#0fff87; #0fff37;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
+                <animate attributeName="stop-color" :dur="duration" values="#aaffff; #20ffff;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
             </stop>
 
         </linearGradient>
