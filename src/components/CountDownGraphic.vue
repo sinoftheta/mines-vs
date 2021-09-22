@@ -6,7 +6,7 @@
             `"
             class="banner-number"
         >
-            3
+            <ThreeSVG/>
         </div>
         <div :style="`
             animation-duration: ${ato3}ms;
@@ -14,7 +14,7 @@
             `"
             class="banner-number"
         >
-            2
+            <TwoSVG/>
         </div>
         <div :style="`
             animation-duration: ${ato3}ms;
@@ -23,17 +23,26 @@
             class="banner-number"
             @animationend="test"
         >
-            1
+            <OneSVG/>
         </div>
     </div>
 </template>
 
 <script>
+import OneSVG from "@/components/OneSVG.vue";
+import TwoSVG from "@/components/TwoSVG.vue";
+import ThreeSVG from "@/components/ThreeSVG.vue";
+
 
 export default {
     name: "CountDownGraphic",
     props:{
         animationTime: Number,
+    },
+    components:{
+        OneSVG,
+        TwoSVG,
+        ThreeSVG
     },
     computed:{
         ato3(){

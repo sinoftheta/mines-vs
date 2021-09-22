@@ -29,7 +29,8 @@ import {p1, p2, neither} from '@/logic/const.js';
 const settings = 'settings';  //settings transmitted
 const standby = 'standby'; // waiting for players to be ready
 const start = 'start'; //signal countdown timer to begin
-const readyNext = 'readyNext';
+const clientReadyNext = 'clientReadyNext';
+const hostReadyNext   = 'hostReadyNext';
 //=-=-=-=-=-=-=-=-//
 const leftClick = 'lclick';
 const flag = 'flag';
