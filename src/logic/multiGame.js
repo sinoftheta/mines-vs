@@ -5,7 +5,7 @@ import State from '@/logic/state';
 import BoardRender from '@/logic/boardRender';
 import MouseHandler from '@/logic/mouseHandler';
 import Peer from 'peerjs';
-import {p1, p2, neither} from '@/logic/const.js';
+import {p1, p2, neither, win, loss, tie} from '@/logic/const.js';
 
 //https://glitch.com/edit/#!/peerjs-video?path=public%2Fmain.js%3A1%3A0
 // NOT WORKING ON LOCAL NETWORK FIX
@@ -29,8 +29,7 @@ import {p1, p2, neither} from '@/logic/const.js';
 const settings = 'settings';  //settings transmitted
 const standby = 'standby'; // waiting for players to be ready
 const start = 'start'; //signal countdown timer to begin
-const clientReadyNext = 'clientReadyNext';
-const hostReadyNext   = 'hostReadyNext';
+const readyNext   = 'readyNext';
 //=-=-=-=-=-=-=-=-//
 const leftClick = 'lclick';
 const flag = 'flag';
@@ -47,10 +46,12 @@ export default class MultiGame{
      * @param {Number}   width width of the board
      * @param {Number}   mines nimber of mines to be placed on the board
      * @param {Number}   px size of game tiles in pixels
+     * @param {Number}   countdownTime // countdown time (in ms) between connection and game start
      * @param {Function} onIdGenerate callback that is passed the clients id when it is received from the peerjs server
      * @param {Function} startCountDownUI callback that starts the countdown UI animation
-     * @param {Number}   countdownTime // countdown time (in ms) between connection and game start
-     * @param {Function} promptPlayAgain(Boolean win) callback that is executed when the game is finished
+     * @param {Function} onEnd([win,loss,tie]) callback that is executed when the game is finished
+     * TODO: @ param {Function} onPeerRegisterError callback that fires when the peer id fails to generate
+     * TODO: @ param {Function} updateRemainingMines
      */
     constructor(
         boardRef, 
@@ -58,13 +59,13 @@ export default class MultiGame{
         width, 
         mines,
         px,
+        countdownTime,
         onIdGenerate,
         startCountDownUI,
-        countdownTime,
-        promptPlayAgain,
+        onEnd,
         ){
 
-        // save stuff
+        // save values
         this.height = height;
         this.width = width;
         this.mines = mines;
@@ -81,17 +82,21 @@ export default class MultiGame{
             () => {},
         );
 
-        //this.onIdGenerate = onIdGenerate; // dont need to save this function as it is used in a lambda with onIdGenerate in scope anyway
+        // save functions
+        //this.onIdGenerate = onIdGenerate; we dont need to save this function as it is used in a lambda that has onIdGenerate in scope anyway
         this.startCountDownUI = startCountDownUI;
         this.countdownTime = countdownTime;
+        this.onEnd = onEnd;
 
-        this.userPoints = 0;
-        this.opponentPoints = 0;
+        // init some values
+        this.playerReadyNext   = false;
         this.opponentReadyNext = false;
+        this.userPoints     = 0;
+        this.opponentPoints = 0;
         this.xInit = 0;
         this.yInit = 0;
 
-        // Register with the peer server
+        // register with the peer server
         if(process.env.VUE_APP_USE_PUBLIC_PEERJS == 'true'){
             this.peer = new Peer({
                 debug:  Number(process.env.VUE_APP_PEER_DEBUG_LEVEL)
@@ -106,11 +111,13 @@ export default class MultiGame{
             });
         }
 
-        
+        // peer id generation callback        
         this.peer.on('open', (id) => {
             console.log('generated connection code:', id);
             if(onIdGenerate) onIdGenerate(id);
         });
+
+        // error function
         this.peer.on('error', (error) => {
             console.error(error);
         });
@@ -143,10 +150,8 @@ export default class MultiGame{
             });
             this.conn.on('data', (data) => this.hostSwitch(data));
         });
-
-        // use opponent code if supplied
-        //if(opponentConnectCode) this.opponentCode = opponentConnectCode;
     }
+    get client() { return !this.host;}
     set opponentCode(code){
 
         console.log('setting opponent code:', code);
@@ -171,6 +176,7 @@ export default class MultiGame{
                 this.multiplayerInit();
                 setTimeout(() => {this.startGame();}, this.countdownTime);
                 break;
+            //TODO: refactor everything in the rest of this function into a new layer
             case leftClick:
                 this.opponentLeftClick(data.x, data.y);
                 break;
@@ -185,9 +191,8 @@ export default class MultiGame{
                 break;
             case readyNext:
                 this.opponentReadyNext = true;
-                if(this.playerReadyNext){
-                    // startGame with new seed
-                }
+                this.attemptStartNextGame();
+                break;
 
         }
     }
@@ -223,30 +228,27 @@ export default class MultiGame{
                 break;
             case readyNext:
                 this.opponentReadyNext = true;
-                this.seed = data.seed;
-
-                this.clientAttemptStart();
-                
-
+                this.attemptStartNextGame();
         }
     }
-    clientReady(){
+    userReady(){
         this.playerReadyNext = true;
         this.conn.send({type: readyNext});
-        this.clientAttemptStart();
+        this.attemptStartNextGame();
     }
-    clientAttemptStart(){
+    attemptStartNextGame(){
         if(this.playerReadyNext && this.opponentReadyNext){
-            this.setBoardSync();
-            this.conn.send({type: standby});
+
+            this.seed = this.state.rng();
+            this.playerReadyNext = false;
+            this.opponentReadyNext = false;
+
+            // client sends standy message, forcing each player back into the setup loop
+            if( this.client ) {
+                this.setBoardSync();
+                this.conn.send({type: standby});
+            }
         }
-    }
-    handlePing(){
-        if(this.prevPingTs){
-            console.log(`rtt: ` + `%c${(Date.now() - this.prevPingTs - 2 * pingInterval)}` + `%cms`, 'color:green', 'color: white');
-        }
-        setTimeout(() => this.conn.send({type: ping}), pingInterval);
-        this.prevPingTs = Date.now();
     }
     setBoardSync(){
         //resets the board with a syncronised state
@@ -305,7 +307,12 @@ export default class MultiGame{
 
         console.log(`you scored: ${points}, your total: ${this.userPoints += points}`);
 
-        this.checkForWinner();
+        if( points < 0){
+            // game lost!
+            this.onEnd(loss);
+        }else{
+            this.checkForWinner();
+        }
     }
     opponentLeftClick(x,y){
         // before the game starts, each tile will be randomly assigned a "player point priority." 
@@ -313,20 +320,28 @@ export default class MultiGame{
         // if we receive an opponent click on a tile that has already been uncovered on the board, we look to the "player point priority" value
         // of the tile to determine which player should own the tile
 
+        let points = 0;
+
         const target = this.state.board[x][y];
         // if tile is revealed, look to the player point priority of the tile to determine if the opponent gets the tile, or if the click is ignored by the client
         if(target.revealed && target.ppp == this.opponent){
             console.log('opponent click overriding at:',x,y)
-            const points = this.state.reclaimTiles(this.opponent, x,y);
+            points = this.state.reclaimTiles(this.opponent, x,y);
         }
         else if(!target.revealed){
             console.log('opponent click at:',x,y);
-            const points = this.state.revealPoints(x,y, this.opponent, x,y);
+            points = this.state.revealPoints(x,y, this.opponent, x,y);
         }
         this.render.drawAll();
         this.render.highlight(this.mouseHandler.curX, this.mouseHandler.curY);
 
-        this.checkForWinner();
+        // TODO: refactor this if structure and checkForWinner()? 
+        if( points < 0){
+            // opponent lost!
+            this.onEnd(win);
+        }else{
+            this.checkForWinner();
+        }
 
     }
     checkForWinner(){
@@ -336,18 +351,16 @@ export default class MultiGame{
 
             if(winner == this.player){
                 console.log("you won!");
+                this.onEnd(win);
             }
             else if(winner == this.opponent){
                 console.log("you lost!");
+                this.onEnd(loss);
             }
             else {
                 console.log("its a tie!");
+                this.onEnd(tie);
             }
-
-
-            // prompt for play again
-
-
         }
     }
 
@@ -391,21 +404,22 @@ export default class MultiGame{
         console.log('chording');
         if(!this.gameActive) return;
 
-        const {points, revealList} = this.resolveChord(i,j, this.player);
+        const {points, revealList, uncoveredMine} = this.resolveChord(i,j, this.player);
         this.conn.send({type: chord, list: revealList});
 
         this.render.drawAll();
         this.render.highlight(this.mouseHandler.curX, this.mouseHandler.curY);
 
-        if(this.state.clear){
-            // game won
-            console.log('game over!');
-            return;
+        console.log('revealList from chord', revealList);
+        
+
+        if( uncoveredMine){
+            this.onEnd(loss);
+        }else{
+            this.checkForWinner();
         }
     }
     opponentChord(list){
-        // BUG: need to resolve opponents chord as well...?
-
         console.log('opponent chording!', list);
         list.forEach(({x,y}) => this.opponentLeftClick(x,y));
     }
@@ -419,6 +433,7 @@ export default class MultiGame{
     resolveChord(i,j, owner){
         let points = 0;
         let revealList = [];
+        let uncoveredMine = false;
         let neighborFlagCount = 0;
 
         const choordTarg = this.state.board[i][j];
@@ -439,7 +454,9 @@ export default class MultiGame{
         if(neighborFlagCount === choordTarg.value){
             revealList.forEach( ({x,y}) => {
                 if(this.state.board[x][y].revealed) return;
-                points += this.state.revealPoints(x,y, owner, i,j);
+                const p  = this.state.revealPoints(x,y, owner, i,j);
+                points += p;
+                if(p < 0) uncoveredMine = true;
             });
         }
         else { // update reveal list to account for no tiles being revealed
@@ -448,7 +465,14 @@ export default class MultiGame{
         }
 
         
-        return {points, revealList};
+        return {points, revealList, uncoveredMine};
+    }
+    handlePing(){
+        if(this.prevPingTs){
+            console.log(`rtt: ` + `%c${(Date.now() - this.prevPingTs - 2 * pingInterval)}` + `%cms`, 'color:green', 'color: white');
+        }
+        setTimeout(() => this.conn.send({type: ping}), pingInterval);
+        this.prevPingTs = Date.now();
     }
     /**
      * A reveal tile function that skips checking if the tile has already been reveraled, but respects PPP.

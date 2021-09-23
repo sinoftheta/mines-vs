@@ -14,10 +14,9 @@ import WinLossSVG from "@/components/WinLossSVG.vue";
 export default {
     name: "PlayAgainBanner",
     props: {
-        gameWon: Boolean,
-        multiPlayer: Boolean,
+        show: Boolean,
+        gameWon: String,
         playAgain: Function,
-        show: Boolean
     },
     components:{
         WinLossSVG
@@ -66,8 +65,6 @@ export default {
 .slide-leave-to {
     animation-name: exit;
 }
-
-
 
 .banner{
     width: 300vw;

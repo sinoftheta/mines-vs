@@ -109,7 +109,7 @@
         </g>
         <g class="status" @click="statusClick">
             <!-- "Win!" text and fill-->
-            <g v-if="gameWon" class="win" >
+            <g v-if="win" class="win" >
                 <!-- status outline -->
                 <path class="outline-text" d="M401.44,137.87H281.8l-19.15-19.15V96.66H240.6L215.34,71.4h140.02l46.08,46.07V137.87z M284.29,131.87h111.16v-11.92
                     L352.88,77.4H229.83l13.26,13.26h25.57v25.58L284.29,131.87z"
@@ -144,7 +144,7 @@
                 </g>
             </g>
             <!-- "Loss" text and fill-->
-            <g v-else class="lose">
+            <g v-if="loss" class="lose">
                 <!-- status outline -->
                 <path class="outline-text" d="M401.44,137.87H281.8l-19.15-19.15V96.66H240.6L215.34,71.4h140.02l46.08,46.07V137.87z M284.29,131.87h111.16v-11.92
                     L352.88,77.4H229.83l13.26,13.26h25.57v25.58L284.29,131.87z"
@@ -197,6 +197,9 @@
                         C319.6,104.8,319.98,106.5,319.98,108.84z"/>
                 </g>
             </g>
+            <g v-if="tie">
+                tie!
+            </g>
         </g>
         
 
@@ -205,10 +208,16 @@
 </template>
 
 <script>
+import {win, loss, tie} from '@/logic/const.js';
 export default {
     name: "WinLossSvg",
     props: {
-        gameWon: Boolean,
+        gameWon: String,
+    },
+    computed: {
+        win() {return this.gameWon == win;},
+        loss(){return this.gameWon == loss;},
+        tie() {return this.gameWon == tie;}
     },
     methods: {
         playAgainClick() {

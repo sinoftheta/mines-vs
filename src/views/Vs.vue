@@ -6,6 +6,7 @@
         <div>{{opponentScore}}</div>
         <div>{{minesRemaining}}</div-->
         <CountDownGraphic :animationTime="cdAnimationTime" v-if="showCountDown"/>
+        <PlayAgainBanner @playAgainClick="playAgainClick" :show="showPlayAgainBanner" :gameWon="gameWon"/>
 
         <div>
             <div>your connect code</div>
@@ -38,26 +39,39 @@
 <script>
 import MultiGame from '@/logic/multiGame.js';
 import CountDownGraphic from '@/components/CountDownGraphic.vue';
+import PlayAgainBanner from "@/components/PlayAgainBanner.vue";
+import {win, loss, tie} from '@/logic/const.js';
 
 export default {
     name: 'Vs',
     data: function(){
-
+        this.autoPlayTimer = null;
         this.game = null;
         return {
             userConnectCode: 'generating code...',
             opponentConnectCode: '',
-            userScore: 0,
-            opponentScore: 0,
-            minesRemaining: 0,
+            showPlayAgainBanner: false,
+            gameWon: null,
             cdAnimationTime: 2300,
             showCountDown: false,
         }
     },
     components: {
-        CountDownGraphic
+        CountDownGraphic,
+        PlayAgainBanner
     },
     methods:{
+        //TODO
+        onEnd(winStatus){ // winStatus can be: win, loss, tie
+            // console.log("game over! win = ", winStatus);
+            this.showPlayAgainBanner = true;
+            this.gameWon = winStatus;
+
+            // autoplay the next game if autoplay is on in the settings
+            if(this.$store.state.autoPlay){
+                this.autoPlayTimer = setTimeout(this.playAgainClick, 800);
+            }
+        },
         setUserConnectCode(code){
             //console.log('dat code:', code)
             this.userConnectCode = code;
@@ -78,7 +92,7 @@ export default {
 
             //spawn count down modal
             this.showCountDown = true;
-            setTimeout(() => {this.showCountDown = false}, time);
+            setTimeout(() => {this.showCountDown = false;}, time);
             
         },
         challengeUrl(){ // maybe shoul be a computed
@@ -95,23 +109,31 @@ export default {
                 this.opponentConnectCode = this.$route.query.challenge;
                 this.game.opponentCode = this.$route.query.challenge;
             }
+        },
+        playAgainClick(){
+            this.game.userReady();
+
+            // reset timer
+            // reset remaining mines 
+
+            this.showPlayAgainBanner = false;
+            clearTimeout(this.autoPlayTimer);
         }
 
     },
     mounted(){
-        
         this.game = new MultiGame(
             this.$refs.boardCanvas,
             this.$store.state.height,
             this.$store.state.width,
             this.$store.state.mines,
-            35,
+            35, // TODO: put this in vuex
+            this.cdAnimationTime,
             this.onCodeGenerate,
             this.startCountDown,
-            this.cdAnimationTime,
+            this.onEnd,
+            // TODO: this.updateRemainingMines
             );
-
-
     }
 
 }
@@ -119,5 +141,4 @@ export default {
 
 <!-- Add 'scoped' attribute to limit CSS to this component only -->
 <style scoped>
-
 </style>

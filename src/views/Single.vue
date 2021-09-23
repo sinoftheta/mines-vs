@@ -3,7 +3,7 @@
         <div>Solo</div>
         <canvas ref="boardCanvas"></canvas>
         <div>remaining: {{remainingMines}}</div>
-        <PlayAgainBanner v-on:playAgainClick="playAgainClick" :show="showPlayAgainBanner" :gameWon="gameWon"/>
+        <PlayAgainBanner @playAgainClick="playAgainClick" :show="showPlayAgainBanner" :gameWon="gameWon"/>
     </div>
 </template>
 
@@ -17,15 +17,16 @@ export default {
         PlayAgainBanner
     },
     data: function () {
+        this.autoPlayTimer = null;
         this.game = null; // important https://stackoverflow.com/questions/68602389/maximum-call-stack-error-when-attempting-to-update-chart-in-vue-js
         return {
             remainingMines: this.$store.state.mines,
             showPlayAgainBanner: false,
-            gameWon: false,
+            gameWon: null,
         };
     },
     methods:{
-        onEnd(winStatus){
+        onEnd(winStatus){ // winStatus can be: win, loss, tie
             // console.log("game over! win = ", winStatus);
             this.showPlayAgainBanner = true;
             this.gameWon = winStatus;
@@ -41,7 +42,7 @@ export default {
                 this.$store.state.height,
                 this.$store.state.width,
                 this.$store.state.mines,
-                35,
+                35, // TODO: put this in vuex
                 this.onEnd,
                 this.updateRemainingMines
             );
@@ -65,5 +66,4 @@ export default {
 
 <!-- Add 'scoped' attribute to limit CSS to this component only -->
 <style scoped>
-
 </style>

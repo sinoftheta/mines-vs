@@ -2,7 +2,7 @@ import State from '@/logic/state';
 import BoardRender from '@/logic/boardRender';
 import MouseHandler from './mouseHandler';
 
-import {p1} from '@/logic/const.js'; // for debugging purposes - multiplayer features are tested in singleplayer first
+import {p1, win, loss} from '@/logic/const.js'; // for debugging purposes - multiplayer features are tested in singleplayer first
 
 export default class SingleGame{
     /**
@@ -78,13 +78,13 @@ export default class SingleGame{
         //console.log(`scored: ${points}, total: ${this.points += points}`);
         if( points < 0){
             // game lost!
-            this.onEnd(false);
+            this.onEnd(loss);
             // stop timer
             return;
         }
         else if(this.state.clear){
             // game won
-            this.onEnd(true);
+            this.onEnd(win);
             return;
         }
     }
