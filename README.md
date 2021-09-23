@@ -21,9 +21,24 @@ wasm priority:
 3. game managers
 
 # Known Issues
-In Chrome, Peerjs connection will fail when two players are on the same local network due to NAT traversal.
+In Chrome, Peerjs connection may fail when two players are on the same local network due to NAT traversal.
 To fix, open `chrome://flags/`, Search for `Anonymize local IPs exposed by WebRTC` and disable it.
 
+
+## .env configuration
+```
+VUE_APP_PEER_SERVER=localhost
+=8081
+VUE_APP_USE_PUBLIC_PEERJS=true
+VUE_APP_PEER_DEBUG_LEVEL=0
+```
+### Using a peer.js server
+
+VUE_APP_USE_PUBLIC_PEERJS can be 'true' or 'false' to switch between using the public peer.js server and a locally hosted one.
+
+VUE_APP_PEER_SERVER should be 'localhost' if you are hosting the server yourself.
+
+VUE_APP_PORT is the port of your local peer.js server .
 
 
 ## Project setup
@@ -44,6 +59,11 @@ yarn build
 ### Lints and fixes files
 ```
 yarn lint
+```
+
+### Starts local Peer.js server
+```
+yarn start
 ```
 
 ### Customize configuration
