@@ -19,7 +19,6 @@
             <stop class="fill-stop-2" offset="100%" >
                 <animate attributeName="stop-color" :dur="duration" values="#c70fff; #430fff; #c70fff;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
             </stop>
-
         </radialGradient>
         <linearGradient id="checker-gradient-1" x1="0" x2="0" y1="1" y2="0">
             <stop class="outline" offset="0%" />

@@ -51,7 +51,7 @@ export default {
             opponentScore: 0,
             minesRemaining: 0,
             cdAnimationTime: 2300,
-            showCountDown: true,
+            showCountDown: false,
         }
     },
     components: {
