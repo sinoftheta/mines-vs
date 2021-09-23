@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="container">
         <div>Solo</div>
         <canvas ref="boardCanvas"></canvas>
         <div>remaining: {{remainingMines}}</div>
