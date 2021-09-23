@@ -3,32 +3,34 @@
     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
         width="458.33px" height="375.82px" viewBox="0 0 458.33 375.82" style="enable-background:new 0 0 458.33 375.82; height:100%; width:100%;"
         xml:space="preserve">
-        <linearGradient id="fill-gradient-3"
+        <radialGradient id="fill-gradient-3"
             spreadMethod="reflect"
-            gradientTransform="rotate(77)"
+            
         >
-            <animate attributeName="x1" :dur="duration" from="69%" to="15%" repeatCount="indefinite" /> <!-- radius of the start circle of the radial gradient -->
-            <animate attributeName="x2"  :dur="duration" from="65%" to="1%" repeatCount="indefinite" /> <!-- radius of the end circle of the radial gradient -->
+            <animate attributeName="fr" :dur="duration" values="90%;100%;90%;" repeatCount="indefinite" /> <!-- radius of the start circle of the radial gradient -->
+            <animate attributeName="r"  :dur="duration" values="40%;45%;40%;" repeatCount="indefinite" /> <!-- radius of the end circle of the radial gradient -->
+            <animate attributeName="cx" :dur="duration" values="30%;35%;30%;" repeatCount="indefinite" /> <!-- x coordinate of the end circle of the radial gradient -->
+            <animate attributeName="cy" :dur="duration" values="60%;100%;60%;" repeatCount="indefinite" /> <!-- y coordinate of the end circle of the radial gradient -->
+            <animate attributeName="fx" :dur="duration" values="10%;40%;10%;" repeatCount="indefinite" /> <!-- x coordinate of the start circle of the radial gradient -->
+            <animate attributeName="fy" :dur="duration" values="60%;100%;60%;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
+            <animate attributeName="gradient-transform" :dur="duration" values="rotate(20);rotate(69);rotate(20);" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
             <stop offset="0%" >
-                <animate attributeName="stop-color" :dur="duration" values="#00eaff; #00ff44;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
+                <animate attributeName="stop-color" :dur="duration" values="#ff2e1f; #ff571f; #ff2e1f;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
             </stop>
             <stop offset="100%" >
-                <animate attributeName="stop-color" :dur="duration" values="#aaffff; #20ffff;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
+                <animate attributeName="stop-color" :dur="duration" values="#ff841f; #ffb41f; #ff841f;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
             </stop>
 
-        </linearGradient>
+        </radialGradient>
         <linearGradient id="circle-gradient-3" x1="0" x2="0" y1="1" y2="0">
             <stop class="outline" offset="0%" />
             <stop class="outline" offset="100%" stop-opacity="0.5"/>
         </linearGradient>
         <g>
-            <path d="M423.02,109.16l-7.17,26.25c-9.39,35-22.95,52.51-40.66,52.51c17.71,0,21.79,17.5,12.22,52.5l-7.17,26.26
-                c-14.18,52.5-47.84,78.76-100.98,78.76H40.08l28.43-105.01h186.03l7.17-26.26h-106.3l40.93-52.5h79.72l6.91-26.26H96.94
-                l28.7-105.01h239.17C417.97,30.39,437.37,56.65,423.02,109.16z"/>
-            <path class="st0" d="M364.82,30.39H125.64L96.94,135.4h186.03l-6.91,26.26h-79.72l-40.93,52.5h106.3l-7.17,26.26H68.51
+            <path fill="url(#fill-gradient-3)" d="M364.82,30.39H125.64L96.94,135.4h186.03l-6.91,26.26h-79.72l-40.93,52.5h106.3l-7.17,26.26H68.51
                 L40.08,345.43h239.17c53.15,0,86.81-26.26,100.98-78.76l7.17-26.26c9.57-35,5.49-52.5-12.22-52.5c17.71,0,31.27-17.51,40.66-52.51
                 l7.17-26.25C437.37,56.65,417.97,30.39,364.82,30.39z"/>
-            <path class="st1" d="M48.24,329.42c-6.13,0-11.09,4.91-11.09,10.96s4.97,10.96,11.09,10.96s11.09-4.91,11.09-10.96
+            <path fill="url(#circle-gradient-3)" d="M48.24,329.42c-6.13,0-11.09,4.91-11.09,10.96s4.97,10.96,11.09,10.96s11.09-4.91,11.09-10.96
                 S54.36,329.42,48.24,329.42z M74.47,329.42c-6.13,0-11.09,4.91-11.09,10.96s4.97,10.96,11.09,10.96s11.09-4.91,11.09-10.96
                 S80.6,329.42,74.47,329.42z M100.7,329.42c-6.13,0-11.09,4.91-11.09,10.96s4.97,10.96,11.09,10.96s11.09-4.91,11.09-10.96
                 S106.83,329.42,100.7,329.42z M126.94,329.42c-6.13,0-11.09,4.91-11.09,10.96s4.97,10.96,11.09,10.96s11.09-4.91,11.09-10.96
@@ -146,7 +148,7 @@
                 s1.86-0.82,1.86-1.84S326.99,174.12,325.96,174.12z M352.19,174.12c-1.03,0-1.86,0.82-1.86,1.84s0.83,1.84,1.86,1.84
                 s1.86-0.82,1.86-1.84S353.22,174.12,352.19,174.12z M378.43,174.12c-1.03,0-1.86,0.82-1.86,1.84s0.83,1.84,1.86,1.84
                 c1.03,0,1.86-0.82,1.86-1.84S379.45,174.12,378.43,174.12z"/>
-            <path d="M443.14,30.92C427.24,10.4,400.89,0,364.82,0H102.09L56.77,165.8h97.51l-34.47,44.23H44.89L0,375.82h279.25
+            <path class="outline" d="M443.14,30.92C427.24,10.4,400.89,0,364.82,0H102.09L56.77,165.8h97.51l-34.47,44.23H44.89L0,375.82h279.25
                 c66.65,0,113.07-35.99,130.69-101.23l7.17-26.26c4.5-16.45,8.43-35.96,4.61-53.33c9.94-12.36,17.9-29.61,23.82-51.67l7.17-26.26
                 C462.62,80.87,459.4,51.88,443.14,30.92z M423.02,109.16l-7.17,26.25c-9.39,35-22.95,52.51-40.66,52.51
                 c17.71,0,21.79,17.5,12.22,52.5l-7.17,26.26c-14.18,52.5-47.84,78.76-100.98,78.76H40.08l28.43-105.01h186.03l7.17-26.26h-106.3
@@ -156,24 +158,14 @@
 </template>
 
 <style scoped>
-@keyframes status-line-text{
-    0%{
-        transform: translateX(0px);
-        opacity: 1;
-    }
-    85%{
-        transform: translateX(0px);
-        opacity: 1;
-    }
-    100%{
-        transform: translateX(var(--distance));
-        opacity: 0;
-    }
+* {
+    --outline-color: #180f29;
 }
-
-
-
+.outline {
+    stop-color: var(--outline-color);
+    fill:       var(--outline-color);
+}
 </style>
 
-<script> export default {name: "ThreeSVG"} 
+<script> export default { name: "ThreeSVG", data(){return {duration: "900ms"}} } // duration has to line up with when the svg is visible (determined by CountDownGraphic animation)
 </script>

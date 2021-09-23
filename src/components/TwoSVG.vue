@@ -6,15 +6,14 @@
 
         <linearGradient id="fill-gradient-2"
                     spreadMethod="reflect"
-                    gradientTransform="rotate(77)"
+                    gradientTransform="rotate(-69)"
         >
-            <animate attributeName="x1" :dur="duration" from="69%" to="15%" repeatCount="1" /> <!-- radius of the start circle of the radial gradient -->
-            <animate attributeName="x2"  :dur="duration" from="65%" to="1%" repeatCount="1" /> <!-- radius of the end circle of the radial gradient -->
-            <stop offset="0%" >
-                <animate attributeName="stop-color" :dur="duration" values="#00eaff; #00ff44;" repeatCount="1" /> <!-- y coordinate of the start circle of the radial gradient -->
+            <animate attributeName="x1"  :dur="duration" values="69%;15%;69%;" repeatCount="indefinite" /> <!-- radius of the start circle of the radial gradient -->
+            <animate attributeName="x2"  :dur="duration" values="60%;1%;60%;" repeatCount="indefinite" /> <!-- radius of the end circle of the radial gradient -->            <stop offset="0%" >
+                <animate attributeName="stop-color" :dur="duration" values="#00eaff; #00ff44; #00eaff;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
             </stop>
             <stop offset="100%" >
-                <animate attributeName="stop-color" :dur="duration" values="#aaffff; #20ffff;" repeatCount="1" /> <!-- y coordinate of the start circle of the radial gradient -->
+                <animate attributeName="stop-color" :dur="duration" values="#aaffff; #20ffff; #aaffff;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
             </stop>
 
         </linearGradient>

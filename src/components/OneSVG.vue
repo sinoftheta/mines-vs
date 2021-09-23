@@ -7,17 +7,17 @@
         <radialGradient id="fill-gradient-1"
                     spreadMethod="reflect"
         >
-            <animate attributeName="fr" :dur="duration" from="15%" to="20%" repeatCount="indefinite" /> <!-- radius of the start circle of the radial gradient -->
-            <animate attributeName="r"  :dur="duration" from="29%" to="36%" repeatCount="indefinite" /> <!-- radius of the end circle of the radial gradient -->
-            <animate attributeName="cx" :dur="duration" from="73%" to="71%" repeatCount="indefinite" /> <!-- x coordinate of the end circle of the radial gradient -->
-            <animate attributeName="cy" :dur="duration" from="22%" to="27%" repeatCount="indefinite" /> <!-- y coordinate of the end circle of the radial gradient -->
-            <animate attributeName="fx" :dur="duration" from="64%" to="65%" repeatCount="indefinite" /> <!-- x coordinate of the start circle of the radial gradient -->
-            <animate attributeName="fy" :dur="duration" from="30%" to="35%" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
+            <animate attributeName="fr" :dur="duration" values="15%;20%;15%" repeatCount="indefinite" /> <!-- radius of the start circle of the radial gradient -->
+            <animate attributeName="r"  :dur="duration" values="31%;35%;31%" repeatCount="indefinite" /> <!-- radius of the end circle of the radial gradient -->
+            <animate attributeName="cx" :dur="duration" values="73%;71%;73%" repeatCount="indefinite" /> <!-- x coordinate of the end circle of the radial gradient -->
+            <animate attributeName="cy" :dur="duration" values="22%;27%;22%" repeatCount="indefinite" /> <!-- y coordinate of the end circle of the radial gradient -->
+            <animate attributeName="fx" :dur="duration" values="64%;65%;64%" repeatCount="indefinite" /> <!-- x coordinate of the start circle of the radial gradient -->
+            <animate attributeName="fy" :dur="duration" values="30%;35%;30%" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
             <stop class="fill-stop-1" offset="0%" >
-                <animate attributeName="stop-color" :dur="duration" values="#ff0fe7; #730fff;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
+                <animate attributeName="stop-color" :dur="duration" values="#ff0fe7; #730fff; #ff0fe7;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
             </stop>
             <stop class="fill-stop-2" offset="100%" >
-                <animate attributeName="stop-color" :dur="duration" values="#c70fff; #430fff;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
+                <animate attributeName="stop-color" :dur="duration" values="#c70fff; #430fff; #c70fff;" repeatCount="indefinite" /> <!-- y coordinate of the start circle of the radial gradient -->
             </stop>
 
         </radialGradient>
@@ -44,33 +44,12 @@
 * {
     --outline-color: #180f29;
 }
-@keyframes status-line-text{
-    0%{
-        transform: translateX(0px);
-        opacity: 1;
-    }
-    85%{
-        transform: translateX(0px);
-        opacity: 1;
-    }
-    100%{
-        transform: translateX(var(--distance));
-        opacity: 0;
-    }
-}
 .outline {
     stop-color: var(--outline-color);
     fill:       var(--outline-color);
 }
 
-.fill-stop-2{
-    stop-color: rgb(250, 92, 255);
-}
-.fill-stop-1{
-    stop-color: rgb(149, 92, 255);
-}
-
 </style>
 
-<script> export default { name: "OneSVG", data(){return {duration: "1200ms"}} }
+<script> export default { name: "OneSVG", data(){return {duration: "1150ms"}} }
 </script>
