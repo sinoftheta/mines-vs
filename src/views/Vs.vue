@@ -6,7 +6,13 @@
         <div>{{opponentScore}}</div>
         <div>{{minesRemaining}}</div-->
         <CountDownGraphic :animationTime="cdAnimationTime" v-if="showCountDown"/>
-        <PlayAgainBanner @playAgainClick="playAgainClick" :show="showPlayAgainBanner" :gameWon="gameWon"/>
+        <PlayAgainBanner 
+            @playAgainClick="playAgainClick" 
+            :show="showPlayAgainBanner" 
+            :gameWon="gameWon" 
+            :opponentReady="opponentReady" 
+            :multiplayer="true"
+        />
 
         <div>
             <div>your connect code</div>
@@ -54,6 +60,7 @@ export default {
             gameWon: null,
             cdAnimationTime: 2300,
             showCountDown: false,
+            opponentReady: false,
         }
     },
     components: {
@@ -110,6 +117,7 @@ export default {
                 this.game.opponentCode = this.$route.query.challenge;
             }
         },
+        onOpponentReady(){this.opponentReady = true;},
         playAgainClick(){
             this.game.userReady();
 
@@ -117,6 +125,7 @@ export default {
             // reset remaining mines 
 
             this.showPlayAgainBanner = false;
+            this.opponentReady = false;
             clearTimeout(this.autoPlayTimer);
         }
 
@@ -132,6 +141,7 @@ export default {
             this.onCodeGenerate,
             this.startCountDown,
             this.onEnd,
+            this.onOpponentReady
             // TODO: this.updateRemainingMines
             );
     }

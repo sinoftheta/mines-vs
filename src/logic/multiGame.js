@@ -50,6 +50,7 @@ export default class MultiGame{
      * @param {Function} onIdGenerate callback that is passed the clients id when it is received from the peerjs server
      * @param {Function} startCountDownUI callback that starts the countdown UI animation
      * @param {Function} onEnd([win,loss,tie]) callback that is executed when the game is finished
+     * @param {Function} onOpponentReady callback executed when client receives opponent ready message
      * TODO: @ param {Function} onPeerRegisterError callback that fires when the peer id fails to generate
      * TODO: @ param {Function} updateRemainingMines
      */
@@ -63,6 +64,7 @@ export default class MultiGame{
         onIdGenerate,
         startCountDownUI,
         onEnd,
+        onOpponentReady,
         ){
 
         // save values
@@ -87,6 +89,7 @@ export default class MultiGame{
         this.startCountDownUI = startCountDownUI;
         this.countdownTime = countdownTime;
         this.onEnd = onEnd;
+        this.onOpponentReady = onOpponentReady;
 
         // init some values
         this.playerReadyNext   = false;
@@ -191,6 +194,7 @@ export default class MultiGame{
                 break;
             case readyNext:
                 this.opponentReadyNext = true;
+                this.onOpponentReady();
                 this.attemptStartNextGame();
                 break;
 
@@ -228,6 +232,7 @@ export default class MultiGame{
                 break;
             case readyNext:
                 this.opponentReadyNext = true;
+                this.onOpponentReady();
                 this.attemptStartNextGame();
         }
     }

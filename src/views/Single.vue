@@ -3,7 +3,12 @@
         <div>Solo</div>
         <canvas ref="boardCanvas"></canvas>
         <div>remaining: {{remainingMines}}</div>
-        <PlayAgainBanner @playAgainClick="playAgainClick" :show="showPlayAgainBanner" :gameWon="gameWon"/>
+        <PlayAgainBanner 
+            @playAgainClick="playAgainClick" 
+            :show="showPlayAgainBanner" 
+            :gameWon="gameWon" 
+            :multiplayer="false"
+        />
     </div>
 </template>
 

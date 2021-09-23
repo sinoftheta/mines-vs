@@ -4,6 +4,9 @@
             <div>
                 <WinLossSVG :gameWon="gameWon" @playAgainClick="playAgainClick" @statusClick="statusClick"/>
             </div>
+            <div v-if="multiplayer">
+                {{opponentReady ? 'Opponent Ready' : 'Waiting on Opponent'}}
+            </div>
         </div>
     </transition>
 </template>
@@ -14,9 +17,11 @@ import WinLossSVG from "@/components/WinLossSVG.vue";
 export default {
     name: "PlayAgainBanner",
     props: {
+        opponentReady: Boolean,
         show: Boolean,
         gameWon: String,
         playAgain: Function,
+        multiplayer: Boolean,
     },
     components:{
         WinLossSVG
