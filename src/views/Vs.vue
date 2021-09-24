@@ -59,10 +59,10 @@ export default {
             opponentConnectCode: '',
             cdAnimationTime: 2300,
             showCountDown: false,
-            showPlayAgainBanner: false,
-            opponentReady: false,
             winStatus: null,
-            
+            playerReady: false,
+            opponentReady: false,
+            showPlayAgainBanner: false,
         }
     },
     components: {
@@ -120,14 +120,19 @@ export default {
             }
         },
         onOpponentReady(){this.opponentReady = true;},
+        onBothPlayersReady(){
+            this.showPlayAgainBanner = false;
+
+            // this mirrors the pattern in the multiGame class, could do a vue watch on those vars? 
+            this.opponentReady = false;
+            this.playerReady = false;
+        },
         playAgainClick(){
             this.game.userReady();
+            this.playerReady = true; // could also use a watch on the games playerReady variable? same with opponentReady
 
             // reset timer
             // reset remaining mines 
-
-            this.showPlayAgainBanner = false;
-            this.opponentReady = false;
             clearTimeout(this.autoPlayTimer);
         }
 
@@ -143,7 +148,8 @@ export default {
             this.onCodeGenerate,
             this.startCountDown,
             this.onEnd,
-            this.onOpponentReady
+            this.onOpponentReady,
+            this.onBothPlayersReady
             // TODO: this.updateRemainingMines
             );
     }
