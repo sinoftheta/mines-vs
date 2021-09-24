@@ -6,7 +6,7 @@
         <PlayAgainBanner 
             @playAgainClick="playAgainClick" 
             :show="showPlayAgainBanner" 
-            :gameWon="gameWon" 
+            :winStatus="winStatus" 
             :multiplayer="false"
         />
     </div>
@@ -27,14 +27,14 @@ export default {
         return {
             remainingMines: this.$store.state.mines,
             showPlayAgainBanner: false,
-            gameWon: null,
+            winStatus: null,
         };
     },
     methods:{
         onEnd(winStatus){ // winStatus can be: win, loss, tie
             // console.log("game over! win = ", winStatus);
             this.showPlayAgainBanner = true;
-            this.gameWon = winStatus;
+            this.winStatus = winStatus;
 
             // autoplay the next game if autoplay is on in the settings
             if(this.$store.state.autoPlay){

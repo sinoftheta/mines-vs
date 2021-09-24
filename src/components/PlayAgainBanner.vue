@@ -2,7 +2,7 @@
     <transition name="slide">
         <div class="banner" v-if="show">
             <div>
-                <WinLossSVG :gameWon="gameWon" @playAgainClick="playAgainClick" @statusClick="statusClick"/>
+                <WinLossSVG :winStatus="winStatus" @playAgainClick="playAgainClick" @statusClick="statusClick"/>
             </div>
             <div v-if="multiplayer">
                 {{opponentReady ? 'Opponent Ready' : 'Waiting on Opponent'}}
@@ -19,7 +19,7 @@ export default {
     props: {
         opponentReady: Boolean,
         show: Boolean,
-        gameWon: String,
+        winStatus: String,
         playAgain: Function,
         multiplayer: Boolean,
     },

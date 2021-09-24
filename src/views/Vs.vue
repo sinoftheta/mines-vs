@@ -9,7 +9,7 @@
         <PlayAgainBanner 
             @playAgainClick="playAgainClick" 
             :show="showPlayAgainBanner" 
-            :gameWon="gameWon" 
+            :winStatus="winStatus" 
             :opponentReady="opponentReady" 
             :multiplayer="true"
         />
@@ -47,7 +47,7 @@
 import MultiGame from '@/logic/multiGame.js';
 import CountDownGraphic from '@/components/CountDownGraphic.vue';
 import PlayAgainBanner from "@/components/PlayAgainBanner.vue";
-import {win, loss, tie} from '@/logic/const.js';
+// import {win, loss, tie} from '@/logic/const.js';
 
 export default {
     name: 'Vs',
@@ -57,11 +57,12 @@ export default {
         return {
             userConnectCode: 'generating code...',
             opponentConnectCode: '',
-            showPlayAgainBanner: false,
-            gameWon: null,
             cdAnimationTime: 2300,
             showCountDown: false,
+            showPlayAgainBanner: false,
             opponentReady: false,
+            winStatus: null,
+            
         }
     },
     components: {
@@ -73,7 +74,7 @@ export default {
         onEnd(winStatus){ // winStatus can be: win, loss, tie
             // console.log("game over! win = ", winStatus);
             this.showPlayAgainBanner = true;
-            this.gameWon = winStatus;
+            this.winStatus = winStatus;
 
             // autoplay the next game if autoplay is on in the settings
             if(this.$store.state.autoPlay){

@@ -198,7 +198,9 @@
                 </g>
             </g>
             <g v-if="tie" class="tie">
-                <g>
+                <g class="outline-text">
+                    <path d="M401.44,137.87H281.8l-19.15-19.15V96.66H240.6L215.34,71.4h140.02l46.08,46.07V137.87z M284.29,131.87h111.16v-11.92
+                    L352.88,77.4H229.83l13.26,13.26h25.57v25.58L284.29,131.87z"/>
                     <path d="M281.66,93.06v4.15h8.28v21.5h5.37v-21.5h8.31v-4.15H281.66z"/>
                     <path d="M305.24,99.01v19.7h5.11v-19.7H305.24z M305.24,91.69v3.77h5.11v-3.77H305.24z"/>
                     <path d="M332.45,109.7c0-3.62-0.74-6.37-2.24-8.24c-1.49-1.88-3.65-2.81-6.48-2.81c-2.96,0-5.25,0.87-6.86,2.62
@@ -207,7 +209,7 @@
                         h12.63V109.7z M319.85,106.64c0.04-1.51,0.38-2.68,1.03-3.52c0.65-0.83,1.58-1.25,2.78-1.25c1.13,0,2.03,0.4,2.69,1.19
                         c0.67,0.8,1.05,1.99,1.15,3.58H319.85z"/>
                 </g>
-                <g>
+                <g class="fill status-fill" >
                     <path d="M352.88,77.4H229.83l13.26,13.26h25.56v25.58l15.64,15.63h111.15v-11.92L352.88,77.4z M303.62,97.21h-8.31v21.5h-5.37
                         v-21.5h-8.28v-4.15h21.96V97.21z M310.35,118.71h-5.11v-19.7h5.11V118.71z M310.35,95.46h-5.11v-3.77h5.11V95.46z M332.45,109.84
                         h-12.63c0,1.92,0.35,3.37,1.06,4.34c0.71,0.98,1.72,1.47,3.03,1.47c0.9,0,1.64-0.2,2.22-0.59c0.57-0.4,0.98-0.98,1.21-1.76
@@ -227,12 +229,12 @@ import {win, loss, tie} from '@/logic/const.js';
 export default {
     name: "WinLossSvg",
     props: {
-        gameWon: String,
+        winStatus: String,
     },
     computed: {
-        win() {return this.gameWon == win;},
-        loss(){return this.gameWon == loss;},
-        tie() {return this.gameWon == tie;}
+        win() {return this.winStatus == win;},
+        loss(){return this.winStatus == loss;},
+        tie() {return this.winStatus == tie;}
     },
     methods: {
         playAgainClick() {
@@ -319,10 +321,12 @@ export default {
     animation: 1690ms ease-in-out 0ms infinite alternate play-again-line-text;
 }
 
+.tie .fill,
 .win .fill,
 .lose .fill {
     animation: 1690ms ease-in-out 35ms infinite alternate status-fill;
 }
+.tie .outline-text,
 .win .outline-text,
 .lose .outline-text {
     animation: 1690ms ease-in-out 35ms infinite alternate status-line-text;
