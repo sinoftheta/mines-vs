@@ -14,9 +14,21 @@
 <script>
 import WinLossSVG from "@/components/WinLossSVG.vue";
 
+
+// banner states
+
+// (play again) - (waiting)
+// (play again) - (opponent ready)
+// (ready)      - (waiting)
+
+// autoplay toggle button
+
+// win/loss/tie button
+
 export default {
     name: "PlayAgainBanner",
     props: {
+        playerReady: Boolean,
         opponentReady: Boolean,
         show: Boolean,
         winStatus: String,
@@ -35,7 +47,15 @@ export default {
             console.log(won ? 'congradulations!' : 'sorry');
         }
     },
-    computed:{
+    computed: {
+        autoplay: {
+            get(){
+                return this.$srore.state.autoplay;
+            },
+            set(){
+                // i forget lol
+            }
+        }
     }
 }
 </script>

@@ -10,6 +10,7 @@
             @playAgainClick="playAgainClick" 
             :show="showPlayAgainBanner" 
             :winStatus="winStatus" 
+            :playerReady="playerReady"
             :opponentReady="opponentReady" 
             :multiplayer="true"
         />
