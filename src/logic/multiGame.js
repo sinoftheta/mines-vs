@@ -95,6 +95,7 @@ export default class MultiGame{
         this.onBothPlayersReady = onBothPlayersReady;
 
         // init some values
+        this.gameActive = false;
         this.playerReadyNext   = false;
         this.opponentReadyNext = false;
         this.userPoints     = 0;
@@ -280,6 +281,7 @@ export default class MultiGame{
             (x,y) => {     this.userChord(x,y); },
             (x,y) => { this._debugForceClick(x,y); },
         );
+        this.gameActive = false;
     }
     startGame(){// also do more?
         console.log('go!');

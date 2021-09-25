@@ -17,13 +17,13 @@ import WinLossSVG from "@/components/WinLossSVG.vue";
 
 // banner states
 
-// (play again) - (waiting)
+// (play again) - (opponent waiting)
 // (play again) - (opponent ready)
-// (ready)      - (waiting)
+// (ready)      - (opponent waiting)
 
 // autoplay toggle button
 
-// win/loss/tie button
+// win/loss/tie indicator
 
 export default {
     name: "PlayAgainBanner",

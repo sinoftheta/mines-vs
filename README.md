@@ -29,7 +29,7 @@ To fix, open `chrome://flags/`, Search for `Anonymize local IPs exposed by WebRT
 ```
 VUE_APP_PEER_SERVER=localhost
 VUE_APP_PORT=8081
-VUE_APP_USE_PUBLIC_PEERJS=true
+VUE_APP_USE_PUBLIC_PEERJS=false
 VUE_APP_PEER_DEBUG_LEVEL=0
 ```
 ### Using a peer.js server
