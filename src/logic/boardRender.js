@@ -2,6 +2,8 @@
 // handles baseline canvas click functionality
 import {p1, p2} from '@/logic/const.js';
 
+// https://stackoverflow.com/questions/8028864/using-nearest-neighbor-with-css-zoom-on-canvas-and-img
+
 const theme = {
     border: '#808080',
     background1: '#c0c0c0',
