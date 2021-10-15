@@ -29,8 +29,9 @@ const listener = app.listen(port, () => {
 
 // peerjs server
 const peerServer = ExpressPeerServer(listener, {
-  debug: true,
-  path: '/'
+  debug: process.env.VUE_APP_PEER_DEBUG_LEVEL,
+  path: '/',
+  ssl: {},
 });
 
 app.use('/', peerServer);

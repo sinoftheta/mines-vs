@@ -36,9 +36,13 @@ VUE_APP_PEER_DEBUG_LEVEL=0
 
 VUE_APP_USE_PUBLIC_PEERJS can be 'true' or 'false' to switch between using the public peer.js server and a locally hosted one.
 
-VUE_APP_PEER_SERVER should be 'localhost' if you are hosting the server yourself.
+VUE_APP_PEER_SERVER should be the ipv4 address that your application is running on (see image) if you are hosting the server yourself. It will NOT work if you try and google what your IPv4 address is. NOTE: "[localhost normally resolves to the IPv4 loopback address 127.0.0.1](https://en.wikipedia.org/wiki/Localhost)." You can use localhost if you are doing solo testing.
+
+![ipv4 address that your application is running on](https://i.imgur.com/19C15tb.png) 
 
 VUE_APP_PORT is the port of your local peer.js server .
+
+
 
 
 ## Project setup
