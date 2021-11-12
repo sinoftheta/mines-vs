@@ -9,10 +9,10 @@ Time Attack: Play on a sepeprate board with the same layout as your opponent. Cl
 Made with:
 
 peerjs
-Vue (may abandon)
+Vue
 html canvas
 
-Rust WASM (future)
+Rust/C WASM (future)
 electron (future)
 
 wasm priority: 
